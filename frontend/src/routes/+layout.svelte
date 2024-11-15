@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import NavBar from '$lib/NavBar.svelte';
 
 </script>
 
@@ -9,6 +10,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
 </svelte:head>
 
-<slot>
-	
-</slot>
+
+<NavBar></NavBar>
+<slot></slot>
