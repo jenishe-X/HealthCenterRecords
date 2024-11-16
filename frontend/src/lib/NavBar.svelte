@@ -12,10 +12,10 @@
                 <NavHamburger class="text-white " />
       </div>
     <NavUl class="order-1 text-white">
-      <NavLi class="text-white hover:text-green-700" href="/">Home</NavLi>
-      <NavLi class="text-white hover:text-green-700" href="/about">About</NavLi>
-      <NavLi class="text-white hover:text-green-700" href="/docs/components/navbar">Navbar</NavLi>
-      <NavLi class="text-white hover:text-green-700" href="/pricing">Pricing</NavLi>
-      <NavLi class="text-white hover:text-green-700" href="/contact">Contact</NavLi>
+      <NavLi class="text-white hover:text-amber-300" href="/">Home</NavLi>
+      <NavLi class="text-white hover:text-amber-300" href="/about">About</NavLi>
+      <NavLi class="text-white hover:text-amber-300" href="/docs/components/navbar">Navbar</NavLi>
+      <NavLi class="text-white hover:text-amber-300" href="/pricing">Pricing</NavLi>
+      <NavLi class="text-white hover:text-amber-300" href="/contact">Contact</NavLi>
     </NavUl>
   </Navbar>
