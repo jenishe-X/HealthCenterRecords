@@ -11,5 +11,4 @@
 </svelte:head>
 
 
-<NavBar></NavBar>
 <slot></slot>
