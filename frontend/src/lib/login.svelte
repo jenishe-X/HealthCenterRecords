@@ -24,7 +24,7 @@ const handleSignIn = () => {
 }
 
 .cover {
-    background-color: #f6f5f7;
+    background-color: #fcd34d;
     display: flex;
     flex-direction: column;
     justify-content: center;
