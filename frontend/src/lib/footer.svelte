@@ -3,7 +3,8 @@
     import { FacebookSolid, GithubSolid, DiscordSolid, TwitterSolid } from 'flowbite-svelte-icons';
   </script>
   
-  <Footer footerType="socialmedia" class="bg-gray-300">
+  <Footer footerType="socialmedia"  class="bg-white">
+    <!-- style="background-color: #F7F6BB" -->
     <div class="md:flex md:justify-between">
       <div class="mb-6 md:mb-0">
       </div>
