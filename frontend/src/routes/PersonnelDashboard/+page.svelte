@@ -1,6 +1,9 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import Homecard from "$lib/homecard.svelte";
     import NavBar from "$lib/NavBar.svelte";
+    import Footer from "$lib/footer.svelte";
+    import { onMount } from "svelte";
+
 
     let currentText = '';
   let texts = ['The best way to find yourself is to lose yourself in the service of others. – Mahatma Gandhi', 
@@ -182,4 +185,6 @@
             </div>            
         </div>
     </section>
+    <Homecard/>
+    <Footer/>
 </main>
