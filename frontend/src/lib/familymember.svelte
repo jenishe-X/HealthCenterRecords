@@ -3,20 +3,19 @@
     import { Button } from 'flowbite-svelte';
     import { ArrowRightOutline, CirclePlusSolid } from 'flowbite-svelte-icons';
 
-    // Define the father for items
     type Item = {
         id: number;
         lastname: string;
-        father: string;
-        purok: number;
+        firstname: string;
+        familyrole: string;
     };
 
     // Define the data
     let items: Item[] = [
-        { id: 1, lastname: 'Dela Cruz', father: 'Juan', purok: 2017 },
-        { id: 2, lastname: 'Tolentino', father: 'Robert', purok: 2018 },
-        { id: 3, lastname: 'Delos Santos', father: 'Bornok', purok: 2019 },
-        { id: 4, lastname: 'Cerezo', father: 'Roben', purok: 2020 }
+        { id: 1, firstname: 'Bobby', lastname: 'Jones', familyrole: 'Father' },
+        { id: 2, firstname: 'Abie', lastname: 'Jones', familyrole: 'Mother' },
+        { id: 3, firstname: 'Cathy', lastname: 'Jones', familyrole: 'Child 1' },
+        { id: 4, firstname: 'Dale', lastname: 'Jones', familyrole: 'Child 2' }
     ];
 
     // Define a function to handle viewing an item
@@ -32,7 +31,7 @@
     <div class="absolute right-40" style="top: 30px">
       <Button 
         class="mx-6 z-10 bg-green-950 text-white py-2 px-5 rounded hover:bg-green-300 transition-all duration-200 ease-in-out">
-        Add Family
+        Add Family Member 
         <CirclePlusSolid class="w-3 h-3 ml-1 text-white" />
       </Button>
     </div>
@@ -51,17 +50,17 @@
     >
         <TableHead class="bg-amber-300">
             <TableHeadCell>ID</TableHeadCell>
+            <TableHeadCell>First Name</TableHeadCell>
             <TableHeadCell>Last Name</TableHeadCell>
-            <TableHeadCell>Father's Name</TableHeadCell>
-            <TableHeadCell>Purok</TableHeadCell>
+            <TableHeadCell>Family Role</TableHeadCell>
             <TableHeadCell>Actions</TableHeadCell> <!-- New column for actions -->
         </TableHead>
         <TableBody tableBodyClass="divide-y">
             <TableBodyRow slot="row" let:item >
                 <TableBodyCell>{(item as Item).id}</TableBodyCell>
+                <TableBodyCell>{(item as Item).firstname}</TableBodyCell>
                 <TableBodyCell>{(item as Item).lastname}</TableBodyCell>
-                <TableBodyCell>{(item as Item).father}</TableBodyCell>
-                <TableBodyCell>{(item as Item).purok}</TableBodyCell>
+                <TableBodyCell>{(item as Item).familyrole}</TableBodyCell>
                 <TableBodyCell>
                     <Button 
                         style="background-color: #47663B" class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out">
