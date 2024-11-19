@@ -1,14 +1,15 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
     import { Label, Input, InputAddon, ButtonGroup, Select, Textarea, Helper, Radio } from 'flowbite-svelte';
-    import { UserCircleSolid, MapPinAltSolid, LandmarkSolid, ProfileCardSolid } from 'flowbite-svelte-icons';
+    import { UserCircleSolid, MapPinAltSolid, LandmarkSolid, ProfileCardSolid,
+     } from 'flowbite-svelte-icons';
     import { Datepicker, P } from 'flowbite-svelte';
     import { Button, Dropdown, DropdownItem} from 'flowbite-svelte';
     import { ChevronDownOutline } from 'flowbite-svelte-icons';
     import Footer from "$lib/footer.svelte";
     import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
-
-
+    import { Modal } from 'flowbite-svelte';
+    let formModal = false;
 
     let group1 = "Family Role";
     
@@ -22,6 +23,17 @@
     let philmember = '';
     let philbday: Date | null = null;
     let philDM = '';
+
+     let datetime = '';
+  let age = '';
+  let weight = '';
+  let height = '';
+  let bp = '';
+  let temp = '';
+  let complaints = '';
+  let diagnosis = '';
+  let physiciansDirections = '';
+
 
     type Item = {
     id: number;
@@ -306,7 +318,7 @@
 
       <!--Buttons-->
     <div class="mt-10 flex justify-left space-x-4">
-        <button class="text-white rounded-full px-6 py-3 bg-green-950">
+        <button on:click={() => (formModal = true)} class="text-white rounded-full px-6 py-3 bg-green-950">
             Add Visit &rarr;
         </button>
         <button class="text-white rounded-full px-6 py-3 bg-green-950">
@@ -315,6 +327,7 @@
         <button class="text-white rounded-full px-6 py-3 bg-green-950">
             Arcive Profile &rarr;
           </button>
+          
     </div>
 
    
@@ -353,8 +366,115 @@
             </TableBody>
         </Table>
     </div>
-    
 </div>
+
+
+<Modal bind:open={formModal} size="xs" autoclose={false} class="w-full">
+  <form class="flex flex-col space-y-6" action="#">
+    <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Adding Visitation</h3>
+   <!-- Date/Time -->
+<div class="mb-1">
+    <Label for="datetime" class="block mb-2">Date/Time</Label>
+    <ButtonGroup class="w-full">
+      <InputAddon>
+      </InputAddon>
+      <Input id="datetime" bind:value={datetime} placeholder="MM/DD/YYYY HH:MM" />
+    </ButtonGroup>
+  </div>
+  
+  <!-- Age -->
+  <div class="mb-1">
+    <Label for="age" class="block mb-2">Age</Label>
+    <ButtonGroup class="w-full">
+      <InputAddon>
+      </InputAddon>
+      <Input id="age" bind:value={age} placeholder="Enter Age" />
+    </ButtonGroup>
+  </div>
+  
+  <!-- WT -->
+  <div class="mb-1">
+    <Label for="weight" class="block mb-2">WT</Label>
+    <ButtonGroup class="w-full">
+      <InputAddon>
+      </InputAddon>
+      <Input id="weight" bind:value={weight} placeholder="Enter Weight (kg)" />
+    </ButtonGroup>
+  </div>
+  
+  <!-- HT -->
+  <div class="mb-1">
+    <Label for="height" class="block mb-2">HT</Label>
+    <ButtonGroup class="w-full">
+      <InputAddon>
+      </InputAddon>
+      <Input id="height" bind:value={height} placeholder="Enter Height (cm)" />
+    </ButtonGroup>
+  </div>
+  
+  <!-- BP -->
+  <div class="mb-1">
+    <Label for="bp" class="block mb-2">BP</Label>
+    <ButtonGroup class="w-full">
+      <InputAddon>
+      </InputAddon>
+      <Input id="bp" bind:value={bp} placeholder="Enter Blood Pressure" />
+    </ButtonGroup>
+  </div>
+  
+  <!-- Temp -->
+  <div class="mb-1">
+    <Label for="temp" class="block mb-2">Temp</Label>
+    <ButtonGroup class="w-full">
+      <InputAddon>
+      </InputAddon>
+      <Input id="temp" bind:value={temp} placeholder="Enter Temperature (°C)" />
+    </ButtonGroup>
+  </div>
+  
+  <!-- Complaints -->
+  <div class="mb-1">
+    <Label for="complaints" class="block mb-2">Complaints</Label>
+    <ButtonGroup class="w-full">
+      <InputAddon>
+      </InputAddon>
+      <Input id="complaints" bind:value={complaints} placeholder="Enter Complaints" />
+    </ButtonGroup>
+  </div>
+  
+  <!-- Diagnosis -->
+  <div class="mb-1">
+    <Label for="diagnosis" class="block mb-2">Diagnosis</Label>
+    <ButtonGroup class="w-full">
+      <InputAddon>
+      </InputAddon>
+      <Input id="diagnosis" bind:value={diagnosis} placeholder="Enter Diagnosis" />
+    </ButtonGroup>
+  </div>
+  
+  <!-- Physician's Directions -->
+  <div class="mb-1">
+    <Label for="physiciansDirections" class="block mb-2">Physician's Directions</Label>
+    <ButtonGroup class="w-full">
+      <InputAddon>
+      </InputAddon>
+      <Input
+        id="physiciansDirections"
+        bind:value={physiciansDirections}
+        placeholder="Enter Directions"
+      />
+    </ButtonGroup>
+  </div>
+  
+  <!--Buttons-->
+        <div class="mt-5 flex justify-left space-x-4">
+            <button class="text-white rounded-full px-6 py-3 bg-green-950">
+                Add Visit &rarr;
+            </button>    
+        </div>
+    
+  </form>
+</Modal>
 
  
 
