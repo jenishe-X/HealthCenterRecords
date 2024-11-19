@@ -7,6 +7,5 @@
 <NavBar/>
 <main>
 <Memberform/>
-
 </main>
 

@@ -6,6 +6,8 @@
     import { Button, Dropdown, DropdownItem} from 'flowbite-svelte';
     import { ChevronDownOutline } from 'flowbite-svelte-icons';
     import Footer from "$lib/footer.svelte";
+    import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
+
 
 
     let group1 = "Family Role";
@@ -20,6 +22,28 @@
     let philmember = '';
     let philbday: Date | null = null;
     let philDM = '';
+
+    type Item = {
+    id: number;
+    dateTime: string;
+    age: number;
+    wt: string; // Weight
+    ht: string; // Height
+    bp: string; // Blood Pressure
+    temp: string; // Temperature
+    complaints: string;
+    diagnosis: string;
+    physicianDirections: string;
+    };
+
+    // Define the data
+    let items: Item[] = [
+    { id: 1, dateTime: '2024-11-19 10:00', age: 45, wt: '70kg', ht: '175cm', bp: '120/80', temp: '36.7°C', complaints: 'Headache', diagnosis: 'Migraine', physicianDirections: 'Take prescribed medication' },
+    { id: 2, dateTime: '2024-11-18 14:00', age: 40, wt: '65kg', ht: '160cm', bp: '110/70', temp: '36.5°C', complaints: 'Fatigue', diagnosis: 'Anemia', physicianDirections: 'Increase iron intake' },
+    { id: 3, dateTime: '2024-11-17 16:30', age: 20, wt: '55kg', ht: '168cm', bp: '115/75', temp: '37.0°C', complaints: 'Cough', diagnosis: 'Common Cold', physicianDirections: 'Stay hydrated and rest' },
+    { id: 4, dateTime: '2024-11-16 09:15', age: 50, wt: '80kg', ht: '180cm', bp: '130/85', temp: '37.2°C', complaints: 'Back Pain', diagnosis: 'Muscle Strain', physicianDirections: 'Apply heat and rest' }
+];
+
 
   
     let textareaprops = {
@@ -108,9 +132,9 @@
   
   </script>
   
-  <main class="relative">
-    <div class="bg-white mt-10 mb-10 md:mb-20 mx-auto absolute top-10 left-0 right-0 p-5 rounded-lg shadow-md max-w-2xl h-100 z-10">
-        <div class="grid grid-cols-2 gap-6">
+  
+    <div class="bg-white mb-10 md:mb-20 mx-auto absolute top-10 left-0 right-0 p-5 rounded-lg shadow-md max-w-3xl h-100">
+        <div class="grid grid-cols-4 gap-6">
         <!-- Last Name -->
         <div class="mb-1">
           <Label for="name" class="block mb-2">First Name</Label>
@@ -279,18 +303,61 @@
           {/if}
       </div>
 
-    <!--Buttons-->
-    <div class="mt-4 flex justify-center space-x-4">
-        <button on:click={handleSubmit} class="text-white rounded-full px-6 py-3 bg-green-950">
-            Cancel &rarr;
+
+      <!--Buttons-->
+    <div class="mt-10 flex justify-left space-x-4">
+        <button class="text-white rounded-full px-6 py-3 bg-green-950">
+            Add Visit &rarr;
         </button>
-        <button on:click={handleSubmit} class="text-white rounded-full px-6 py-3 bg-green-950">
-          Submit &rarr;
+        <button class="text-white rounded-full px-6 py-3 bg-green-950">
+          Update Profile &rarr;
         </button>
-      </div>
+        <button class="text-white rounded-full px-6 py-3 bg-green-950">
+            Arcive Profile &rarr;
+          </button>
     </div>
 
+   
+    
+    <div class="mt-10 relative justify-center items-center z-0">
+       
+        <Table
+            {items}
+        >
+            <TableHead class="bg-amber-300">
+                <TableHeadCell>ID</TableHeadCell>
+                <TableHeadCell>Date/Time</TableHeadCell>
+                <TableHeadCell>Age</TableHeadCell>
+                <TableHeadCell>WT</TableHeadCell>
+                <TableHeadCell>HT</TableHeadCell>
+                <TableHeadCell>BP</TableHeadCell>
+                <TableHeadCell>Temp</TableHeadCell>
+                <TableHeadCell>Complaints</TableHeadCell>
+                <TableHeadCell>Diagnosis</TableHeadCell>
+                <TableHeadCell>Physician's Directions</TableHeadCell>
+            </TableHead>
+            <TableBody tableBodyClass="divide-y">
+                <TableBodyRow slot="row" let:item >
+                    <TableBodyCell>{(item as Item).id}</TableBodyCell>
+                    <TableBodyCell>{(item as Item).dateTime}</TableBodyCell>
+                    <TableBodyCell>{(item as Item).age}</TableBodyCell>
+                    <TableBodyCell>{(item as Item).wt}</TableBodyCell>
+                    <TableBodyCell>{(item as Item).ht}</TableBodyCell>
+                    <TableBodyCell>{(item as Item).bp}</TableBodyCell>
+                    <TableBodyCell>{(item as Item).temp}</TableBodyCell>
+                    <TableBodyCell>{(item as Item).complaints}</TableBodyCell>
+                    <TableBodyCell>{(item as Item).diagnosis}</TableBodyCell>
+                    <TableBodyCell>{(item as Item).physicianDirections}</TableBodyCell>
 
-  </main>
+                </TableBodyRow>
+            </TableBody>
+        </Table>
+    </div>
+    
+</div>
+
+ 
+
+
   
   
