@@ -1,5 +1,37 @@
 <script lang="ts">
+import { onMount, onDestroy } from "svelte";
+
+let images = [
+    'assets/brgy/10.png',
+    'assets/brgy/11.png',
+    'assets/brgy/12.png',
+    'assets/brgy/13.png',
+    'assets/brgy/14.png',
+    ];
+
+  let currentSlide = 0;
+  let intervalId: number;
+
+  function startSlideshow() {
+    intervalId = setInterval(() => {
+      currentSlide = (currentSlide + 1) % images.length;
+    }, 3000);
+  }
+
+  function stopSlideshow() {
+    clearInterval(intervalId);
+  }
+
+  onMount(() => {
+    startSlideshow();
+  });
+
+  onDestroy(() => {
+    stopSlideshow();
+  });
+
 let rightPanelActive = false;
+
 
 const handleSignUp = () => {
   rightPanelActive = true;
@@ -24,7 +56,6 @@ const handleSignIn = () => {
 }
 
 .cover {
-    background-color: #fcd34d;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -51,12 +82,12 @@ span {
     font-size: medium;
 }
 
-a {
+/* a {
     color: #333;
     font-size: 14px;
     text-decoration: none;
     margin: 20px ;
-}
+} */
 
 .container {
     background: white;
@@ -226,31 +257,64 @@ button.ghost {
 .container.right-panel-active .overlay-right {
     transform: translateX(20%);
 }
+
+/* slider */
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out; 
+  }
+
+  .active {
+    opacity: 1;
+  }
+
+  #slider img {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+  }
+  
+  #slider img.active {
+    opacity: 1;
+  }
 </style>
 
 <main>
+    <div id="slider" class="fixed inset-0 z-0 overflow-hidden">
+        {#each images as image, i}
+          <img
+            src={image}
+            alt={`Slide ${i}`}
+            class="slide {i === currentSlide ? 'active' : ''} object-cover w-full h-full absolute inset-0 opacity-0 transition-opacity duration-1000"
+          />
+        {/each}
+      </div>
+
     <div class="cover">
-    <div class="container {rightPanelActive ? 'right-panel-active' : ''}">
+    <div class="container {rightPanelActive ? 'right-panel-active' : ''} z-10">
         <!-- Sign Up Form -->
         <div class="form-container sign-up-container">
           <form action="#">
-            <h1>Create Account</h1>
-            <span>or use your email for registration</span>
-            <input type="text" placeholder="Name" />
+            <h1>Sign In</h1>
+            <span>Ready to sign in as the Admin?</span>
             <input type="email" placeholder="Email" />
             <input type="password" placeholder="Password" />
-            <button type="button">Sign Up</button>
+            <button type="button">Login</button>
           </form>
         </div>
     
         <!-- Sign In Form -->
         <div class="form-container sign-in-container">
           <form action="#">
-            <h1>Sign in</h1>
+            <h1>Sign In</h1>
             <span>Ready to sign in as the Barangay Personnel?</span>
             <input type="email" placeholder="Email" />
             <input type="password" placeholder="Password" />
-            <a href="/">Forgot your password?</a>
             <button type="button">Login</button>
           </form>
         </div>
@@ -260,8 +324,8 @@ button.ghost {
           <div class="overlay">
             <div class="overlay-panel overlay-left">
                 <img src="assets/logo.png" alt="logo" style="width: 200px; height: auto;">
-              <h1>Hello friend!</h1>
-              <p>Login to your account</p>
+              <h1>Barangay Personnel</h1>
+              <p>Ready to sign in as the Barangay Personnel?</p>
               <button class="ghost" on:click={handleSignIn}>Login</button>
             </div>
             <div class="overlay-panel overlay-right">

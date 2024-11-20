@@ -146,7 +146,7 @@
 <NavBar/>
 
 <main>
-    <div class="flex" style="z-index: -10;">
+    <div class="flex -z-10">
     <div class="waveWrapper waveAnimation">
         <div class="waveWrapperInner bgTop">
           <div class="wave waveTop" style="background-image: url('http://front-end-noobs.com/jecko/img/wave-top.png')"></div>
@@ -170,7 +170,7 @@
                     {currentText}
                 </p>
             </div>
-            <a href="/" class="block">
+            <a href="/Purok" class="block">
                 <button class="mt-12 mx-auto lg:mr-auto lg:ml-0 text-base sm:text-lg md:text-xl poppins relative overflow-hidden px-6 py-3 group rounded-full bg-white text-green-950">
                     <div class="absolute top-0 right-full w-full h-full bg-amber-300 opacity-20 group-hover:translate-x-full z-0 duration-200"></div>
                     <h4 class="relative z-9">Check Records &rarr;</h4>

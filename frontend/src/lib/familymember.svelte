@@ -28,9 +28,10 @@
 
 <div class="relative">
     <!-- Container for the button -->
-    <div class="absolute right-40" style="top: 30px">
+    <div class="absolute right-40 z-10" style="top: 30px">
       <Button 
-        class="mx-6 z-10 bg-green-950 text-white py-2 px-5 rounded hover:bg-green-300 transition-all duration-200 ease-in-out">
+      href="/MemberForm"
+      class="mx-6 z-10 bg-green-950 text-white py-2 px-5 rounded hover:bg-green-700 transition-all duration-200 ease-in-out">
         Add Family Member 
         <CirclePlusSolid class="w-3 h-3 ml-1 text-white" />
       </Button>
@@ -48,14 +49,14 @@
          item.id.toString().includes(searchTerm)
         }
     >
-        <TableHead class="bg-amber-300">
+        <TableHead class="bg-amber-300 text-center text-sm">
             <TableHeadCell>ID</TableHeadCell>
             <TableHeadCell>First Name</TableHeadCell>
             <TableHeadCell>Last Name</TableHeadCell>
             <TableHeadCell>Family Role</TableHeadCell>
             <TableHeadCell>Actions</TableHeadCell> <!-- New column for actions -->
         </TableHead>
-        <TableBody tableBodyClass="divide-y">
+        <TableBody tableBodyClass="divide-y text-center">
             <TableBodyRow slot="row" let:item >
                 <TableBodyCell>{(item as Item).id}</TableBodyCell>
                 <TableBodyCell>{(item as Item).firstname}</TableBodyCell>
@@ -63,7 +64,7 @@
                 <TableBodyCell>{(item as Item).familyrole}</TableBodyCell>
                 <TableBodyCell>
                     <Button 
-                        style="background-color: #47663B" class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out">
+                        style="background-color: #47663B" href="/MemberProfile" class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out">
                         View <ArrowRightOutline class="w-3 h-3 ms-1 text-white" />
                     </Button>
                 </TableBodyCell>
