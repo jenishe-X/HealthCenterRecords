@@ -145,7 +145,7 @@
   </script>
   
   
-    <div class="bg-white mb-10 md:mb-20 mx-auto absolute top-10 left-0 right-0 p-5 rounded-lg shadow-md max-w-3xl h-100">
+    <div class="bg-white mt-10 mx-auto absolute top-10 left-0 right-0 p-5 rounded-lg shadow-md max-w-8xl h-100">
         <div class="grid grid-cols-4 gap-6">
         <!-- Last Name -->
         <div class="mb-1">
