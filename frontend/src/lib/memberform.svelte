@@ -151,14 +151,14 @@
       }
 
       if (!sex) {
-        errors.sex = 'Sex is required';
+        errors.sex = 'This section is required';
         valid = false;
       } else {
         errors.sex = '';
       }
 
       if (!purok) {
-        errors.purok = 'Purok is required';
+        errors.purok = 'This section is required';
         valid = false;
       } else {
         errors.purok = '';
@@ -266,6 +266,9 @@
         <div class="mb-1">
           <Label for="landmark" class="block mb-2">Birthday</Label>
             <Datepicker bind:value={birthday}/>
+            {#if errors.birthday}
+              <Helper class="mt-2" color="red">{errors.birthday}</Helper>
+            {/if}
         </div>
 
         <!--Father's Name-->
@@ -315,9 +318,13 @@
               <Radio name="Male" value="Male" bind:group={sex}>Male</Radio>
               <Radio name="example1" value="2" bind:group={sex}>Female</Radio>
             </div>
+            {#if errors.sex}
+              <Helper class="mt-2" color="red">{errors.sex}</Helper>
+            {/if}
           </div>  
         
-        <!--Purok-->
+        <!-- Purok -->
+        <div class="mb-1">
         <Label>
             Purok
             <Select class="mt-2" bind:value={selectedpurok}>
@@ -329,6 +336,9 @@
           {#if errors.purok}
             <Helper class="mt-2" color="red">{errors.purok}</Helper>
           {/if}
+        </div>
+
+     
 
          <!-- Address -->
          <div class="mb-1">
@@ -360,7 +370,6 @@
         <!--Philhealth-->
         <Label>
             Philhealth
-           
             <Select class="mt-2" bind:value={selected}>
               {#each philhealth as phil}
                 <option value={phil.value}>{phil.name}</option>
@@ -376,10 +385,16 @@
             <div class="-mt-1">
               <Label for="philmember" class="block mb-2">Philhealth Member:</Label>
               <Input id="other-assistance" bind:value={philmember} placeholder="Philhealth Member" />
+              {#if errors.philmember}
+              <Helper class="mt-2" color="red">{errors.philmember}</Helper>
+            {/if}
             </div>
             <div class="-mt-1">
                 <Label for="philbday" class="block mb-2">Member's Birthday</Label>
                 <Datepicker bind:value={philbday}/>
+                {#if errors.philbday}
+              <Helper class="mt-2" color="red">{errors.philbday}</Helper>
+            {/if}
             </div>
             <div class="-mt-1">
                 <div class="mt-4 flex items-center space-x-4">
@@ -387,6 +402,9 @@
                     <div class="flex space-x-6">
                       <Radio name="Member" value="Member" bind:group={philDM}>Member</Radio>
                       <Radio name="Dependent" value="Dependent" bind:group={philDM}>Dependent</Radio>
+                      {#if errors.philDM}
+              <Helper class="mt-2" color="red">{errors.philDM}</Helper>
+            {/if}
                     </div>
                   </div>   
             </div>
