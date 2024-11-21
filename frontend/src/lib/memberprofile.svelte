@@ -11,30 +11,6 @@
     import { Modal } from 'flowbite-svelte';
     let formModal = false;
 
-    let group1 = "Family Role";
-    
-    let name = '';
-    let contactNumber = '';
-    let location = '';
-    let landmark = '';
-    let selected: string = '';
-    let selectedDate: Date | null = null;
-    let selectedValue = '';
-    let philmember = '';
-    let philbday: Date | null = null;
-    let philDM = '';
-
-     let datetime = '';
-  let age = '';
-  let weight = '';
-  let height = '';
-  let bp = '';
-  let temp = '';
-  let complaints = '';
-  let diagnosis = '';
-  let physiciansDirections = '';
-
-
     type Item = {
     id: number;
     dateTime: string;
@@ -57,15 +33,36 @@
 ];
 
 
-  
-    let textareaprops = {
-      id: 'description',
-      name: 'description',
-      label: 'description',
-      rows: 2,
-      placeholder: 'Optional - You may describe the incident...'
-    };
+    
+    let firstname = '';
+    let lastname = '';
+    let middlename = '';
+    let birthday: Date | null = null;
+    let sex = '';
+    let mothername = '';
+    let fathername = '';
+    let contactnumber = '';
+    let selectedpurok = '';
+    let selectedrole = '';
+    let address = '';
+    let selected: string = '';
+    let philmember = '';
+    let philbday: Date | null = null;
+    let philDM = '';
 
+  let datetime = '';
+  let age = '';
+  let weight = '';
+  let height = '';
+  let bp = '';
+  let temp = '';
+  let complaints = '';
+  let diagnosis = '';
+  let physiciansDirections = '';
+
+
+
+  
     let philhealth = [
         {value: 'WithPhilhealth', name: 'With Philhealth'},
         {value: 'NoPhilhealth', name: 'No Philhealth'}
@@ -74,59 +71,172 @@
     let familyrole = [
       { value: 'Father', name: 'Father' },
       { value: 'Mother', name: 'Mother' },
-      { value: 'Child-1', name: 'Child-1' },
-      { value: 'Child-2', name: 'Child-2' },
-      { value: 'Other', name: 'Other' }
+      { value: 'Child', name: 'Child' },
     ];
+
+    let purok = [
+      { value: '1A', name: '1A' },
+      { value: '1B', name: '1B' },
+      { value: '2', name: '2' },
+      { value: '3A', name: '3A' },
+      { value: '3B', name: '3B' },
+      { value: '3C', name: '3C' },
+      { value: '3D', name: '3D' },
+      { value: '3E', name: '3E' },
+      { value: '3F', name: '3F' },
+      { value: '4A', name: '4A' },
+      { value: '4B', name: '4B' },
+      { value: '4C', name: '4C' },
+      { value: '4D', name: '4D' },
+      { value: '4E', name: '4E' },
+      { value: '5A1', name: '5A1' },
+      { value: '5A', name: '5A' },
+      { value: '5B', name: '5B' },
+      { value: '5C', name: '5C' },
+      { value: '5D', name: '5D' },
+      { value: '5E', name: '5E' },
+      { value: '5F', name: '5F' },
+      { value: '6A', name: '6A' },
+      { value: '6A EXT', name: '6A EXT' },
+      { value: '6B1', name: '6B1' },
+      { value: '6B2', name: '6B2' },
+      { value: '6C1', name: '6C1' },
+      { value: '6C2', name: '6C2' },
+      { value: '6D', name: '6D' },
+      { value: '6E', name: '6E' },
+      { value: '7', name: '7' },
+    ];
+
+  
   
     let errors = {
-      name: '',
-      contactNumber: '',
-      location: '',
-      landmark: '',
-      selected: '',
-      otherAssistance: ''
+      firstname: '',
+      lastname: '',
+      middlename: '',
+      birthday: '',
+      mothername: '',
+      fathername: '',
+      contactnumber: '',
+      sex: '',
+      purok: '',
+      address: '',
+      familyrole: '',
+      philhealth: '',
+      philDM: '',
+      philmember: '',
+      philbday: '',
+      
     };
   
     const validateForm = () => {
       let valid = true;
   
-      if (!name) {
-        errors.name = 'Name is required';
+      if (!firstname) {
+        errors.firstname = 'Firstname is required';
         valid = false;
       } else {
-        errors.name = '';
+        errors.firstname = '';
+      }
+
+      if (!lastname) {
+        errors.lastname = 'Lastname is required';
+        valid = false;
+      } else {
+        errors.lastname = '';
+      }
+
+      if (!middlename) {
+        errors.middlename = 'Middlename is required';
+        valid = false;
+      } else {
+        errors.middlename = '';
+      }
+
+      if (!birthday) {
+        errors.birthday = 'Birthdate is required';
+        valid = false;
+      } else {
+        errors.birthday = '';
+      }
+
+      if (!fathername) {
+        errors.fathername = 'Name of the Father is required';
+        valid = false;
+      } else {
+        errors.fathername = '';
+      }
+
+      if (!mothername) {
+        errors.mothername = 'Name of the Mother is required';
+        valid = false;
+      } else {
+        errors.mothername = '';
       }
   
-      if (!contactNumber) {
-        errors.contactNumber = 'Contact number is required';
+      if (!contactnumber) {
+        errors.contactnumber = 'Contact number is required';
         valid = false;
-      } else if (!/^\d{10}$/.test(contactNumber)) {
-        errors.contactNumber = 'Enter a valid 10-digit contact number';
+      } else if (!/^\d{10}$/.test(contactnumber)) {
+        errors.contactnumber = 'Enter a valid 10-digit contact number';
         valid = false;
       } else {
-        errors.contactNumber = '';
+        errors.contactnumber = '';
+      }
+
+      if (!sex) {
+        errors.sex = 'This section is required';
+        valid = false;
+      } else {
+        errors.sex = '';
+      }
+
+      if (!purok) {
+        errors.purok = 'This section is required';
+        valid = false;
+      } else {
+        errors.purok = '';
       }
   
-      if (!location) {
-        errors.location = 'Location is required';
+      if (!address) {
+        errors.address = 'Adress is required';
         valid = false;
       } else {
-        errors.location = '';
+        errors.address = '';
+      }
+
+      if (!familyrole) {
+        errors.familyrole = 'Family Role is required';
+        valid = false;
+      } else {
+        errors.familyrole = '';
       }
   
-      if (!landmark) {
-        errors.landmark = 'Landmark is required';
+      if (!philhealth) {
+        errors.philhealth = 'This section is required';
         valid = false;
       } else {
-        errors.landmark = '';
+        errors.philhealth = '';
       }
   
-      if (!selected) {
-        errors.selected = 'Please select an option';
+      if (!philDM) {
+        errors.philDM = 'This section is required';
         valid = false;
       } else {
-        errors.selected = '';
+        errors.philDM = '';
+      }
+
+      if (!philmember) {
+        errors.philmember = 'This section is required';
+        valid = false;
+      } else {
+        errors.philmember = '';
+      }
+
+      if (!philbday) {
+        errors.philbday = 'This section is required';
+        valid = false;
+      } else {
+        errors.philbday = '';
       }
   
       return valid;
@@ -144,89 +254,91 @@
   
   </script>
   
-  
-    <div class="bg-white mt-10 mx-auto absolute top-10 left-0 right-0 p-5 rounded-lg shadow-md max-w-8xl h-100">
+<div class="relative">
+    <div class="bg-white mx-auto absolute left-0 right-0 p-5 rounded-lg shadow-md max-w-8xl h-100">
         <div class="grid grid-cols-4 gap-6">
-        <!-- Last Name -->
+        <!-- First Name -->
         <div class="mb-1">
-          <Label for="name" class="block mb-2">First Name</Label>
+          <Label for="firstname" class="block mb-2">First Name</Label>
           <ButtonGroup class="w-full">
             <InputAddon>
               <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
             </InputAddon>
-            <Input id="name" bind:value={name} placeholder="Dela Cruz" />
+            <Input id="firstname" bind:value={firstname} placeholder="Dela Cruz" />
           </ButtonGroup>
-          {#if errors.name}
-            <Helper class="mt-2" color="red">{errors.name}</Helper>
+          {#if errors.firstname}
+            <Helper class="mt-2" color="red">{errors.firstname}</Helper>
           {/if}
         </div>
   
         <!-- Last Name -->
         <div class="mb-1">
-          <Label for="contact-number" class="block mb-2">Last Name</Label>
+          <Label for="lastname" class="block mb-2">Last Name</Label>
           <ButtonGroup class="w-full">
-            <Input id="contact-number" bind:value={contactNumber} placeholder="Juan" />
+            <Input id="lastname" bind:value={lastname} placeholder="Juan" />
           </ButtonGroup>
-          {#if errors.contactNumber}
-            <Helper class="mt-2" color="red">{errors.contactNumber}</Helper>
+          {#if errors.lastname}
+            <Helper class="mt-2" color="red">{errors.lastname}</Helper>
           {/if}
         </div>
   
         <!-- Middle Name -->
         <div class="mb-1">
-          <Label for="location" class="block mb-2">Middle Name</Label>
+          <Label for="middlename" class="block mb-2">Middle Name</Label>
           <ButtonGroup class="w-full">
-            <Input id="location" bind:value={location} placeholder="Montez" />
+            <Input id="middlename" bind:value={middlename} placeholder="Montez" />
           </ButtonGroup>
-          {#if errors.location}
-            <Helper class="mt-2" color="red">{errors.location}</Helper>
+          {#if errors.middlename}
+            <Helper class="mt-2" color="red">{errors.middlename}</Helper>
           {/if}
         </div>
   
-        <!-- Birthdate -->
+        <!-- Birthday -->
         <div class="mb-1">
-          <Label for="landmark" class="block mb-2">Birthdate</Label>
-            <Datepicker bind:value={selectedDate}/>
+          <Label for="landmark" class="block mb-2">Birthday</Label>
+            <Datepicker bind:value={birthday}/>
+            {#if errors.birthday}
+              <Helper class="mt-2" color="red">{errors.birthday}</Helper>
+            {/if}
+        </div>
+
+        <!--Father's Name-->
+        <div class="mb-1">
+          <Label for="fathername" class="block mb-2">Father's Name</Label>
+          <ButtonGroup class="w-full">
+            <InputAddon>
+                <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              </InputAddon>
+            <Input id="fathername" bind:value={fathername} placeholder="Full Name" />
+          </ButtonGroup>
+          {#if errors.fathername}
+            <Helper class="mt-2" color="red">{errors.fathername}</Helper>
+          {/if}
         </div>
 
          <!--Mother's Name-->
          <div class="mb-1">
-            <Label for="contact-number" class="block mb-2">Mother's Name</Label>
+            <Label for="mothername" class="block mb-2">Mother's Name</Label>
             <ButtonGroup class="w-full">
               <InputAddon>
                   <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 </InputAddon>
-              <Input id="contact-number" bind:value={contactNumber} placeholder="Full Name" />
+              <Input id="mothername" bind:value={mothername} placeholder="Full Name" />
             </ButtonGroup>
-            {#if errors.contactNumber}
-              <Helper class="mt-2" color="red">{errors.contactNumber}</Helper>
+            {#if errors.mothername}
+              <Helper class="mt-2" color="red">{errors.mothername}</Helper>
             {/if}
           </div>
-
-          <!--Father's Name-->
-          <div class="mb-1">
-            <Label for="contact-number" class="block mb-2">Father's Name</Label>
-            <ButtonGroup class="w-full">
-              <InputAddon>
-                  <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                </InputAddon>
-              <Input id="contact-number" bind:value={contactNumber} placeholder="Full Name" />
-            </ButtonGroup>
-            {#if errors.contactNumber}
-              <Helper class="mt-2" color="red">{errors.contactNumber}</Helper>
-            {/if}
-          </div>
-
 
         <!--Contact Number -->
         <div class="mb-1">
             <Label for="contact-number" class="block mb-2">Contact Number</Label>
             <ButtonGroup class="w-full">
               <InputAddon>(+63)</InputAddon>
-              <Input id="contact-number" bind:value={contactNumber} placeholder="Enter your number" />
+              <Input id="contact-number" bind:value={contactnumber} placeholder="Enter your number" />
             </ButtonGroup>
-            {#if errors.contactNumber}
-              <Helper class="mt-2" color="red">{errors.contactNumber}</Helper>
+            {#if errors.contactnumber}
+              <Helper class="mt-2" color="red">{errors.contactnumber}</Helper>
             {/if}
           </div>
 
@@ -234,104 +346,117 @@
         <div class="mt-4 flex items-center space-x-4">
             <Label for="sex" class="block">Sex: </Label>
             <div class="flex space-x-6">
-              <Radio name="example1" value="1" bind:group={selectedValue}>Male</Radio>
-              <Radio name="example1" value="2" bind:group={selectedValue}>Female</Radio>
+              <Radio name="Male" value="Male" bind:group={sex}>Male</Radio>
+              <Radio name="example1" value="2" bind:group={sex}>Female</Radio>
             </div>
+            {#if errors.sex}
+              <Helper class="mt-2" color="red">{errors.sex}</Helper>
+            {/if}
           </div>  
         
-        <!--Purok-->
+        <!-- Purok -->
+        <div class="mb-1">
         <Label>
             Purok
-            <Select class="mt-2" bind:value={selected}>
-              {#each philhealth as phil}
-                <option value={phil.value}>{phil.name}</option>
+            <Select class="mt-2" bind:value={selectedpurok}>
+              {#each purok as purok}
+                <option value={purok.value}>{purok.name}</option>
               {/each}
             </Select>
           </Label>
-          {#if errors.selected}
-            <Helper class="mt-2" color="red">{errors.selected}</Helper>
+          {#if errors.purok}
+            <Helper class="mt-2" color="red">{errors.purok}</Helper>
           {/if}
+        </div>
+
+     
 
          <!-- Address -->
          <div class="mb-1">
-            <Label for="contact-number" class="block mb-2">Address</Label>
+            <Label for="address" class="block mb-2">Address</Label>
             <ButtonGroup class="w-full">
                 <InputAddon>
                     <MapPinAltSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 </InputAddon>
-              <Input id="contact-number" bind:value={contactNumber} placeholder="Address" />
+              <Input id="address" bind:value={address} placeholder="Address" />
             </ButtonGroup>
-            {#if errors.contactNumber}
-              <Helper class="mt-2" color="red">{errors.contactNumber}</Helper>
+            {#if errors.address}
+              <Helper class="mt-2" color="red">{errors.address}</Helper>
             {/if}
           </div>
         
         <!--Family Role-->
         <Label>
             Family Role
-            <Select class="mt-2" bind:value={selected}>
+            <Select class="mt-2" bind:value={selectedrole}>
               {#each familyrole as role}
                 <option value={role.value}>{role.name}</option>
               {/each}
             </Select>
           </Label>
-          {#if errors.selected}
-            <Helper class="mt-2" color="red">{errors.selected}</Helper>
+          {#if errors.familyrole}
+            <Helper class="mt-2" color="red">{errors.familyrole}</Helper>
           {/if}
       
         <!--Philhealth-->
         <Label>
             Philhealth
-           
             <Select class="mt-2" bind:value={selected}>
               {#each philhealth as phil}
                 <option value={phil.value}>{phil.name}</option>
               {/each}
             </Select>
           </Label>
-          {#if errors.selected}
-            <Helper class="mt-2" color="red">{errors.selected}</Helper>
+          {#if errors.philhealth}
+            <Helper class="mt-2" color="red">{errors.philhealth}</Helper>
           {/if}
 
         <!--With Philhealth-->
         {#if selected === 'WithPhilhealth'}
             <div class="-mt-1">
-              <Label for="other-assistance" class="block mb-2">Philhealth Member:</Label>
+              <Label for="philmember" class="block mb-2">Philhealth Member:</Label>
               <Input id="other-assistance" bind:value={philmember} placeholder="Philhealth Member" />
+              {#if errors.philmember}
+              <Helper class="mt-2" color="red">{errors.philmember}</Helper>
+            {/if}
             </div>
             <div class="-mt-1">
-                <Label for="landmark" class="block mb-2">Member's Birthday</Label>
-                <Datepicker bind:value={selectedDate}/>
+                <Label for="philbday" class="block mb-2">Member's Birthday</Label>
+                <Datepicker bind:value={philbday}/>
+                {#if errors.philbday}
+              <Helper class="mt-2" color="red">{errors.philbday}</Helper>
+            {/if}
             </div>
             <div class="-mt-1">
                 <div class="mt-4 flex items-center space-x-4">
-                    <Label for="sex" class="block">Status: </Label>
+                    <Label for="philDM" class="block">Status: </Label>
                     <div class="flex space-x-6">
-                      <Radio name="example1" value="1" bind:group={selectedValue}>Member</Radio>
-                      <Radio name="example1" value="2" bind:group={selectedValue}>Dependent</Radio>
+                      <Radio name="Member" value="Member" bind:group={philDM}>Member</Radio>
+                      <Radio name="Dependent" value="Dependent" bind:group={philDM}>Dependent</Radio>
+                      {#if errors.philDM}
+              <Helper class="mt-2" color="red">{errors.philDM}</Helper>
+            {/if}
                     </div>
                   </div>   
             </div>
           {/if}
       </div>
 
-
-      <!--Buttons-->
-    <div class="mt-10 flex justify-left space-x-4">
-        <button on:click={() => (formModal = true)} class="text-white rounded-full px-6 py-3 bg-green-950">
-            Add Visit &rarr;
-        </button>
-        <button class="text-white rounded-full px-6 py-3 bg-green-950">
-          Update Profile &rarr;
-        </button>
-        <button class="text-white rounded-full px-6 py-3 bg-green-950">
-            Arcive Profile &rarr;
+    <!--Buttons-->
+        <div class="mt-10 flex justify-left space-x-4">
+          <button on:click={() => (formModal = true)} class="text-white rounded-full px-6 py-3 bg-green-950">
+              Add Visit &rarr;
           </button>
-          
-    </div>
+          <button class="text-white rounded-full px-6 py-3 bg-green-950">
+            Update Profile &rarr;
+          </button>
+          <button class="text-white rounded-full px-6 py-3 bg-green-950">
+            Archive Profile &rarr;
+          </button>
+      </div>
 
    
-    
+   <!--Table Here--> 
     <div class="mt-10 relative justify-center items-center z-0">
        
         <Table
@@ -367,7 +492,7 @@
         </Table>
     </div>
 </div>
-
+</div>
 
 <Modal bind:open={formModal} size="xs" autoclose={false} class="w-full">
   <form class="flex flex-col space-y-6" action="#">
