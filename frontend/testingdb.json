@@ -1,0 +1,22 @@
+{
+    "families": [
+      {
+        "id": 1,
+        "lastname": "Salem",
+        "father": "Joelito",
+        "selectedpurok": "2"
+      },
+      {
+        "id": 2,
+        "lastname": "Jaminal",
+        "father": "Ralph",
+        "selectedpurok": "3A"
+      },
+      {
+        "id": 3,
+        "lastname": "Salem",
+        "father": "Jonathan",
+        "selectedpurok": "4A"
+      }
+    ]
+  }

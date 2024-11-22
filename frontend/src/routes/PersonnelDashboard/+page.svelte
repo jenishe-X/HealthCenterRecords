@@ -6,7 +6,8 @@
 
 
     let currentText = '';
-  let texts = ['The best way to find yourself is to lose yourself in the service of others. – Mahatma Gandhi', 
+  let texts = ['But I need to tell you something...',
+    'The best way to find yourself is to lose yourself in the service of others. – Mahatma Gandhi', 
                 'No one has ever become poor by giving. – Anne Frank', 
                 'Helping one person might not change the whole world, but it could change the world for one person.', 
                 'We ca not help everyone, but everyone can help someone. – Ronald Reagan',
