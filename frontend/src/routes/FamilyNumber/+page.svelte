@@ -2,26 +2,81 @@
     import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
     import { Button, Label, Input, InputAddon, ButtonGroup, Select } from 'flowbite-svelte';
     import { ArrowRightOutline, CirclePlusSolid } from 'flowbite-svelte-icons';
-    import { Modal } from 'flowbite-svelte';
+    import { Modal, Helper } from 'flowbite-svelte';
     import NavBar from '$lib/NavBar.svelte';
+    import { SearchOutline, ArchiveOutline } from 'flowbite-svelte-icons';
+   
 
-    export let data;
-    const families = data.families;
+    interface Family {
+    lastname?: string;
+    familynumber?: number;
+    father?: string;
+    selectedpurok?: string;
+  }
+
+  let families: Family[] = [];
+  let searchTerm: string = ''; // User's search input
+  let loading: boolean = true; // Show a loading indicator
+
+  // Fetch families data
+  const fetchFamilies = async () => {
+    try {
+      const response = await fetch('https://6740cc3cd0b59228b7f162ff.mockapi.io/familynumber');
+      families = await response.json(); // Update families array
+    } catch (error) {
+      console.error('Error fetching families:', error);
+    } finally {
+      loading = false; // Hide loading indicator
+    }
+  };
+
+  fetchFamilies();
+
 
     let formModal = false;
 
-    // Define the father for items
-    type Item = {
-        familynumber: number;
-        lastname: string;
-        father: string;
-        purok: string;
-    };
+    export let family; // Data passed from the load function
 
-    let familynumber = '';
-    let lastname = '';
-    let father = '';
-    let selectedpurok = '';
+    // Initial object for new family data
+    let newFamily = { lastname: '', father: '', selectedpurok: '' };
+
+     // Function to add a new family
+     async function addFamily() {
+        if (!validateForm()) {
+            // Stop submission if validation fails
+            return;
+        }
+
+        try {
+            const response = await fetch("https://6740cc3cd0b59228b7f162ff.mockapi.io/familynumber", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newFamily) // Send newFamily object as JSON
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log("Added family:", result);
+
+                // Add new family to the local list
+                family = [...families, result];
+
+                // Clear the form
+                newFamily = { lastname: '', father: '', selectedpurok: '' };
+
+                alert("Form submitted successfully!");
+            } else {
+                console.error("Failed to post family:", response.status);
+            }
+        } catch (error) {
+            console.error("Error posting data:", error);
+        }
+    }
+
+    
+
 
     let purok = [
       { value: '1A', name: '1A' },
@@ -57,20 +112,55 @@
     ];
 
 
-    // Define the data
-    let items: Item[] = [
-        { familynumber: 1, lastname: 'Dela Cruz', father: 'Juan', purok: '2' },
-        { familynumber: 2, lastname: 'Tolentino', father: 'Robert', purok: '1-B' },
-        { familynumber: 3, lastname: 'Delos Santos', father: 'Bornok', purok: '6-A EXT.' },
-        { familynumber: 4, lastname: 'Cerezo', father: 'Roben', purok: '4' }
-    ];
+    let lastname = '';
+    let father = '';
+    let selectedpurok = '';
 
-    // Define a function to handle viewing an item
-    function viewItem(item: Item) {
-        alert(`Viewing details for ${item.lastname}`);
-        // You can add more logic for modal or navigation here
+
+
+    //Form Validation
+    let errors = {
+    lastname: '',
+    father:'',
+    selectedpurok: '',
+    }; // Object to store validation errors
+
+    // Function to validate the form
+    function validateForm() {
+        let valid = true;
+        errors = {
+          lastname: '',
+          father:'',
+          selectedpurok: '',
+        }; // Reset errors before validation
+
+        if (!newFamily.lastname.trim()) {
+            errors.lastname = "Last Name is required.";
+            valid = false;
+        } else {
+            errors.lastname = "";
+        }
+
+        if (!newFamily.father.trim()) {
+            errors.father = "Father's Name is required.";
+            valid = false;
+        } else {
+            errors.father = "";
+        }
+
+        if (!newFamily.selectedpurok.trim()) {
+            errors.selectedpurok = "Selected Purok is required.";
+            valid = false;
+        } else {
+            errors.selectedpurok = "";
+        }
+
+        return valid;
     }
+
+    
 </script>
+
 
 <NavBar/>
 <main>
@@ -88,14 +178,16 @@
 </div>
 
 <div class="relative justify-center items-center z-0">
-    <Table
-        {items}
-        placeholder="Search by lastname name"
-        hoverable={true}
-        filter={(item: Item, searchTerm: string) => 
-         item.lastname.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         item.familynumber.toString().includes(searchTerm)
-        }
+
+<ButtonGroup class="mt-4 mb-2 p-2 w-80  ml-4">
+  <InputAddon>
+    <SearchOutline class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+  </InputAddon>
+  <Input id="firstname" bind:value={searchTerm} placeholder="Search Lastname or Family number" />
+</ButtonGroup>
+
+  <Table
+  
     >
         <TableHead class="bg-amber-300 text-center text-sm">
             <TableHeadCell>Family No.</TableHeadCell>
@@ -105,9 +197,13 @@
             <TableHeadCell>Actions</TableHeadCell> <!-- New column for actions -->
         </TableHead>
         <TableBody tableBodyClass="divide-y text-center text-sm bg-transparent">
-            {#each families as family}
-                <TableBodyRow>
-                    <TableBodyCell class="bg-transparent">{family.id}</TableBodyCell>
+          {#each families.filter((family: Family) => {
+            const lastname = family?.lastname?.toLowerCase() || ''; // Safeguard
+            const familynumber = family?.familynumber?.toString() || ''; // Safeguard
+            return lastname.includes(searchTerm.toLowerCase()) || familynumber.includes(searchTerm);
+          }) as family}      
+          <TableBodyRow>
+                    <TableBodyCell class="bg-transparent">{family.familynumber}</TableBodyCell>
                     <TableBodyCell class="bg-transparent">{family.lastname}</TableBodyCell>
                     <TableBodyCell class="bg-transparent">{family.father}</TableBodyCell>
                     <TableBodyCell class="bg-transparent">{family.selectedpurok}</TableBodyCell>
@@ -118,6 +214,12 @@
                             class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out">
                             View <ArrowRightOutline class="w-3 h-3 ms-1 text-white" />
                         </Button>
+                        <Button 
+                        style="background-color: #47663B" 
+                        href="/FamilyMember" 
+                        class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out">
+                        Archive <ArchiveOutline class="w-3 h-3 ms-1 text-white" />
+                    </Button>
                     </TableBodyCell>
                 </TableBodyRow>
             {/each}
@@ -127,27 +229,20 @@
 </div>
 
 <Modal bind:open={formModal} size="xs" autoclose={false} class="w-full">
-    <form class="flex flex-col space-y-6" action="#">
+    <form class="flex flex-col space-y-6" action="#" on:submit|preventDefault={addFamily}>
       <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Adding Visitation</h3>
-     
-     <!-- Family Number -->
-  <div class="mb-1">
-      <Label for="familynumber" class="block mb-2">Family Number:</Label>
-      <ButtonGroup class="w-full">
-        <InputAddon>
-        </InputAddon>
-        <Input id="familynumber" bind:value={familynumber} placeholder="Enter Family Number" />
-      </ButtonGroup>
-    </div>
-    
+         
     <!-- Lastname -->
     <div class="mb-1">
       <Label for="lastname" class="block mb-2">Lastname:</Label>
       <ButtonGroup class="w-full">
         <InputAddon>
         </InputAddon>
-        <Input id="lastname" bind:value={lastname} placeholder="Enter Lastname" />
+        <Input id="lastname" bind:value={newFamily.lastname} placeholder="Enter Lastname" />
       </ButtonGroup>
+      {#if errors.lastname}
+      <Helper class="mt-2" color="red">{errors.lastname}</Helper>
+      {/if}
     </div>
     
     <!-- Father name -->
@@ -156,8 +251,11 @@
       <ButtonGroup class="w-full">
         <InputAddon>
         </InputAddon>
-        <Input id="father" bind:value={father} placeholder="Enter Father's Name" />
+        <Input id="father" bind:value={newFamily.father} placeholder="Enter Father's Name" />
       </ButtonGroup>
+      {#if errors.father}
+      <Helper class="mt-2" color="red">{errors.father}</Helper>
+      {/if}
     </div>
     
     <!-- Purok -->
@@ -165,18 +263,21 @@
       <ButtonGroup class="w-full block mb-2"> 
         <Label>
             Purok
-            <Select class="mt-2" bind:value={selectedpurok}>
+            <Select class="mt-2" bind:value={newFamily.selectedpurok}>
               {#each purok as purok}
                 <option value={purok.value}>{purok.name}</option>
               {/each}
             </Select>
           </Label>
       </ButtonGroup>
+      {#if errors.selectedpurok}
+      <Helper class="mt-2" color="red">{errors.selectedpurok}</Helper>
+      {/if}
     </div>
     
     <!--Buttons-->
           <div class="mt-5 flex justify-left space-x-4">
-              <button class="text-white rounded-full px-6 py-3 bg-green-950">
+              <button class="text-white rounded-full px-6 py-3 bg-green-950 hover:bg-green-700">
                   Add Family &rarr;
               </button>    
           </div>
