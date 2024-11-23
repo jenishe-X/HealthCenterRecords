@@ -112,12 +112,6 @@
     ];
 
 
-    let lastname = '';
-    let father = '';
-    let selectedpurok = '';
-
-
-
     //Form Validation
     let errors = {
     lastname: '',
@@ -165,8 +159,7 @@
 <NavBar/>
 <main>
 <div class="relative">
-    <!-- <img src="assets/bg1.png" class="absolute inset-0  object-cover opacity-30 z-0" alt="bg" /> -->
-
+   
     <!-- Container for the button -->
     <div class="absolute right-40 z-20" style="top: 30px">
       <Button 

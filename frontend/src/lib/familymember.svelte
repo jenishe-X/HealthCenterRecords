@@ -1,28 +1,36 @@
 <script lang="ts">
     import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
-    import { Button } from 'flowbite-svelte';
-    import { ArrowRightOutline, CirclePlusSolid } from 'flowbite-svelte-icons';
+    import { Button, ButtonGroup, Input, InputAddon } from 'flowbite-svelte';
+    import { ArrowRightOutline, CirclePlusSolid, SearchOutline } from 'flowbite-svelte-icons';
+    
 
-    type Item = {
-        id: number;
-        lastname: string;
-        firstname: string;
-        familyrole: string;
-    };
+    //Will align the variable to MockAPI - should be changed later on
+    interface Family {
+    lastname?: string;
+    familynumber?: number;
+    father?: string;
+    selectedpurok?: string;
+  }
 
-    // Define the data
-    let items: Item[] = [
-        { id: 1, firstname: 'Bobby', lastname: 'Jones', familyrole: 'Father' },
-        { id: 2, firstname: 'Abie', lastname: 'Jones', familyrole: 'Mother' },
-        { id: 3, firstname: 'Cathy', lastname: 'Jones', familyrole: 'Child 1' },
-        { id: 4, firstname: 'Dale', lastname: 'Jones', familyrole: 'Child 2' }
-    ];
+  let families: Family[] = [];
+  let searchTerm: string = ''; // User's search input
+  let loading: boolean = true; // Show a loading indicator
 
-    // Define a function to handle viewing an item
-    function viewItem(item: Item) {
-        alert(`Viewing details for ${item.lastname}`);
-        // You can add more logic for modal or navigation here
+   // Fetch families data
+   const fetchFamilies = async () => {
+    try {
+      const response = await fetch('https://6740cc3cd0b59228b7f162ff.mockapi.io/familynumber');
+      families = await response.json(); // Update families array
+    } catch (error) {
+      console.error('Error fetching families:', error);
+    } finally {
+      loading = false; // Hide loading indicator
     }
+  };
+
+  fetchFamilies();
+
+  
 </script>
 
 
@@ -39,15 +47,16 @@
 </div>
 
 <div class="relative justify-center items-center z-0">
+
+    <ButtonGroup class="mt-4 mb-2 p-2 w-80  ml-4">
+        <InputAddon>
+          <SearchOutline class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+        </InputAddon>
+        <Input id="firstname" bind:value={searchTerm} placeholder="Search Lastname or Family number" />
+      </ButtonGroup>
    
     <Table
-        {items}
-        placeholder="Search by lastname name"
-        hoverable={true}
-        filter={(item: Item, searchTerm: string) => 
-         item.lastname.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         item.id.toString().includes(searchTerm)
-        }
+       
     >
         <TableHead class="bg-amber-300 text-center text-sm">
             <TableHeadCell>ID</TableHeadCell>
@@ -57,11 +66,16 @@
             <TableHeadCell>Actions</TableHeadCell> <!-- New column for actions -->
         </TableHead>
         <TableBody tableBodyClass="divide-y text-center">
-            <TableBodyRow slot="row" let:item >
-                <TableBodyCell>{(item as Item).id}</TableBodyCell>
-                <TableBodyCell>{(item as Item).firstname}</TableBodyCell>
-                <TableBodyCell>{(item as Item).lastname}</TableBodyCell>
-                <TableBodyCell>{(item as Item).familyrole}</TableBodyCell>
+            {#each families.filter((family: Family) => {
+                const lastname = family?.lastname?.toLowerCase() || ''; // Safeguard
+                const familynumber = family?.familynumber?.toString() || ''; // Safeguard
+                return lastname.includes(searchTerm.toLowerCase()) || familynumber.includes(searchTerm);
+              }) as family}   
+            <TableBodyRow>
+                <TableBodyCell>{family.familynumber}</TableBodyCell>
+                <TableBodyCell>{family.lastname}</TableBodyCell>
+                <TableBodyCell>{family.father}</TableBodyCell>
+                <TableBodyCell>{family.selectedpurok}</TableBodyCell>
                 <TableBodyCell>
                     <Button 
                         style="background-color: #47663B" href="/MemberProfile" class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out">
@@ -69,6 +83,7 @@
                     </Button>
                 </TableBodyCell>
             </TableBodyRow>
+            {/each}
         </TableBody>
     </Table>
 </div>
