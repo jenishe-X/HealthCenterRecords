@@ -1,12 +1,8 @@
 <script lang="ts">
-    import { onMount, onDestroy } from 'svelte';
     import { Label, Input, InputAddon, ButtonGroup, Select, Textarea, Helper, Radio } from 'flowbite-svelte';
-    import { UserCircleSolid, MapPinAltSolid, LandmarkSolid, ProfileCardSolid,
+    import { UserCircleSolid, MapPinAltSolid, 
      } from 'flowbite-svelte-icons';
-    import { Datepicker, P } from 'flowbite-svelte';
-    import { Button, Dropdown, DropdownItem} from 'flowbite-svelte';
-    import { ChevronDownOutline } from 'flowbite-svelte-icons';
-    import Footer from "$lib/footer.svelte";
+    import { Datepicker } from 'flowbite-svelte';
     import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
     import { Modal } from 'flowbite-svelte';
     let formModal = false;
@@ -55,7 +51,7 @@
   let weight = '';
   let height = '';
   let bp = '';
-  let temp = '';
+  let temp = '';  
   let complaints = '';
   let diagnosis = '';
   let physiciansDirections = '';

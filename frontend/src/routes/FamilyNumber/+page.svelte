@@ -8,42 +8,51 @@
    
 
     interface Family {
-    lastname?: string;
+    familylastname: string;
     familynumber?: number;
     father?: string;
-    selectedpurok?: string;
+    purok?: string;
   }
 
   let families: Family[] = [];
-  let searchTerm: string = ''; // User's search input
-  let loading: boolean = true; // Show a loading indicator
+  let searchTerm: string = ''; 
+  let loading: boolean = true; 
 
-  // Fetch families data
-  const fetchFamilies = async () => {
-    try {
-      const response = await fetch('https://6740cc3cd0b59228b7f162ff.mockapi.io/familynumber');
-      families = await response.json(); // Update families array
-    } catch (error) {
-      console.error('Error fetching families:', error);
-    } finally {
-      loading = false; // Hide loading indicator
+  
+
+const fetchFamilies = async () => {
+  try {
+    const response = await fetch('http://localhost/api/familynumber');
+    const result = await response.json();
+
+    if (Array.isArray(result.data)) {
+      families = result.data as Family[];
+      console.log('Fetched Families:', families);
+    } else {
+      console.error('Expected an array but received:', result.data);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching families:', error);
+  } finally {
+    loading = false;
+  }
+};
 
-  fetchFamilies();
+fetchFamilies();
+
+
 
 
     let formModal = false;
 
-    export let family; // Data passed from the load function
+    export let family;
+     // Data passed from the load function
 
     // Initial object for new family data
     let newFamily = { lastname: '', father: '', selectedpurok: '' };
 
-     // Function to add a new family
      async function addFamily() {
         if (!validateForm()) {
-            // Stop submission if validation fails
             return;
         }
 
@@ -53,17 +62,17 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newFamily) // Send newFamily object as JSON
+                body: JSON.stringify(newFamily) 
             });
 
             if (response.ok) {
                 const result = await response.json();
                 console.log("Added family:", result);
 
-                // Add new family to the local list
+                
                 family = [...families, result];
 
-                // Clear the form
+              
                 newFamily = { lastname: '', father: '', selectedpurok: '' };
 
                 alert("Form submitted successfully!");
@@ -151,7 +160,6 @@
 
         return valid;
     }
-
     
 </script>
 
@@ -179,27 +187,25 @@
   <Input id="firstname" bind:value={searchTerm} placeholder="Search Lastname or Family number" />
 </ButtonGroup>
 
-  <Table
-  
-    >
+  <Table>
         <TableHead class="bg-amber-300 text-center text-sm">
             <TableHeadCell>Family No.</TableHeadCell>
             <TableHeadCell>Last Name</TableHeadCell>
             <TableHeadCell>Father's Name</TableHeadCell>
             <TableHeadCell>Purok</TableHeadCell>
-            <TableHeadCell>Actions</TableHeadCell> <!-- New column for actions -->
+            <TableHeadCell>Actions</TableHeadCell>
         </TableHead>
         <TableBody tableBodyClass="divide-y text-center text-sm bg-transparent">
           {#each families.filter((family: Family) => {
-            const lastname = family?.lastname?.toLowerCase() || ''; // Safeguard
-            const familynumber = family?.familynumber?.toString() || ''; // Safeguard
-            return lastname.includes(searchTerm.toLowerCase()) || familynumber.includes(searchTerm);
+            const familylastname = family?.familylastname?.toLowerCase() || ''; 
+            const familynumber = family?.familynumber?.toString() || ''; 
+            return familylastname.includes(searchTerm.toLowerCase()) || familynumber.includes(searchTerm);
           }) as family}      
           <TableBodyRow>
                     <TableBodyCell class="bg-transparent">{family.familynumber}</TableBodyCell>
-                    <TableBodyCell class="bg-transparent">{family.lastname}</TableBodyCell>
+                    <TableBodyCell class="bg-transparent">{family.familylastname}</TableBodyCell>
                     <TableBodyCell class="bg-transparent">{family.father}</TableBodyCell>
-                    <TableBodyCell class="bg-transparent">{family.selectedpurok}</TableBodyCell>
+                    <TableBodyCell class="bg-transparent">{family.purok}</TableBodyCell>
                     <TableBodyCell class="bg-transparent">
                         <Button 
                             style="background-color: #47663B" 
@@ -219,6 +225,7 @@
         </TableBody>
         
     </Table>
+
 </div>
 
 <Modal bind:open={formModal} size="xs" autoclose={false} class="w-full">

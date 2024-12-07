@@ -304,7 +304,9 @@ button.ghost {
             <span>Ready to sign in as the Admin?</span>
             <input type="email" placeholder="Email" />
             <input type="password" placeholder="Password" />
+            <a href="/PersonnelDashboard">
             <button type="button">Login</button>
+          </a>
           </form>
         </div>
     
@@ -315,7 +317,9 @@ button.ghost {
             <span>Ready to sign in as the Barangay Personnel?</span>
             <input type="email" placeholder="Email" />
             <input type="password" placeholder="Password" />
+            <a href="/PersonnelDashboard">
             <button type="button">Login</button>
+            </a>
           </form>
         </div>
     
