@@ -1,6 +1,63 @@
 <script lang="ts">
      import { Card, Button } from 'flowbite-svelte';
      import { ArrowRightOutline } from 'flowbite-svelte-icons';
+     import { onMount } from 'svelte';
+     import { page } from '$app/stores';
+     import { goto } from '$app/navigation';
+
+
+//      interface Member {
+//         familynumberid: number;
+//         userid?: number;
+//         firstname?: string;
+//         lastname?: string;
+//         middlename?: string;
+//         birthday?: Date | null;
+//         sex?: string;
+//         contactnumber?: string;
+//         purok?: string;
+//         address?: string;
+//         familyrole?: string;
+//         fathername?: string;
+//         mothername?: string;
+//         philhealth?: string;
+//         philmember?: string;
+//         philDM?: string;
+//         philbday?: Date | null;
+//     }
+
+  
+//     let purok: string = $page.params.purok;
+//     let member: Member | null = null;
+//     let isLoading = true;
+
+
+  
+  
+//     onMount(async () => {
+//     try {
+//         const response = await fetch(`http://localhost/api/purok/${purok}`);
+//         if (response.ok) {
+//             const data = await response.json(); // Parse the JSON
+//             console.log(data); // Inspect the full response to debug
+            
+//             // Access the payload array
+//             if (data.payload && data.payload.length > 0) {
+//                 member = data.payload[0]; // Get the first member object
+//                 console.log(member); // Logs the actual member details
+//             } else {
+//                 console.error('No member data found in payload');
+//             }
+//         } else {
+//             console.error('Failed to fetch member data');
+//         }
+//     } catch (error) {
+//         console.error('Error fetching data:', error);
+//     } finally {
+//         isLoading = false;
+//     }
+// });
+
 </script>
 
 <main class="bg-amber-300 min-h-screen">
@@ -15,7 +72,9 @@
             <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
               Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.
             </p>
-            <Button class="bg-green-950 w-fit" href="/FamilyNumber">
+            <Button class="bg-green-950 w-fit" 
+            on:click={() => window.location.href = `/Purok/1-A`}
+            >
               Check <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
             </Button>
           </Card>
@@ -24,7 +83,8 @@
             <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">
               Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.
             </p>
-            <Button class="w-fit bg-green-950">
+            <Button class="w-fit bg-green-950"
+            on:click={() => window.location.href = `/Purok/1-B`}>
               Check <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
             </Button>
           </Card>

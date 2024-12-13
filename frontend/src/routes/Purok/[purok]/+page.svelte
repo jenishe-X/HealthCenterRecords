@@ -6,6 +6,8 @@
     import NavBar from '$lib/NavBar.svelte';
     import { SearchOutline, ArchiveOutline } from 'flowbite-svelte-icons';
     import { Router, Route } from 'svelte-routing';
+    import { onMount } from 'svelte';
+    import { page } from '$app/stores';
    
 
     interface Family {
@@ -21,27 +23,37 @@
 
   
 
-const fetchFamilies = async () => {
-  try {
-    const response = await fetch('http://localhost/api/familynumber');
-    const result = await response.json();
+  let purok: string = $page.params.purok;
+  let isLoading = true;
 
-    if (Array.isArray(result.data)) {
-      families = result.data as Family[];
-      console.log('Fetched Families:', families);
-    } else {
-      console.error('Expected an array but received:', result.data);
-    }
-  } catch (error) {
-    console.error('Error fetching families:', error);
-  } finally {
-    loading = false;
-  }
-};
+  
+  onMount(async () => {
+        try {
+            const response = await fetch(`http://localhost/api/purok2/${purok}`);
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
 
-fetchFamilies();
-
-
+                // Assign the payload data to visits
+                if (data.payload && data.payload.length > 0) {
+                    families = data.payload.map((item: any): Family => ({
+                        familylastname: item.familylastname,
+                        familynumber: item.familynumber,
+                        father: item.father,
+                        purok: item.purok,
+                    }));
+                } else {
+                    console.error('No visitation data found in payload');
+                }
+            } else {
+                console.error('Failed to fetch visitation data');
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            isLoading = false;
+        }
+    });
 
 
     let formModal = false;
@@ -88,7 +100,7 @@ fetchFamilies();
     
 
 
-    let purok = [
+    let selectpurok = [
       { value: '1A', name: '1A' },
       { value: '1B', name: '1B' },
       { value: '2', name: '2' },
@@ -210,8 +222,10 @@ fetchFamilies();
                     <TableBodyCell class="bg-transparent">
                         <Button 
                             style="background-color: #47663B" 
-                            href="/FamilyMember" 
-                            class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out">
+                            class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out"
+                            on:click={() => window.location.href = `${family.purok}/Family/${family.familynumber}`}
+
+                            >
                             View <ArrowRightOutline class="w-3 h-3 ms-1 text-white" />
                         </Button>
                         <Button 
@@ -265,7 +279,7 @@ fetchFamilies();
         <Label>
             Purok
             <Select class="mt-2" bind:value={newFamily.selectedpurok}>
-              {#each purok as purok}
+              {#each selectpurok as purok}
                 <option value={purok.value}>{purok.name}</option>
               {/each}
             </Select>

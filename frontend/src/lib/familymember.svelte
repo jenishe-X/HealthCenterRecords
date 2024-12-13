@@ -2,54 +2,54 @@
     import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
     import { Button, ButtonGroup, Input, InputAddon } from 'flowbite-svelte';
     import { ArrowRightOutline, CirclePlusSolid, SearchOutline } from 'flowbite-svelte-icons';
-    
+    import { navigate } from 'svelte-routing';
+    import { Router, Route, Link } from 'svelte-routing';
+    import Memberprofile from './memberprofile.svelte';
+    import { goto } from '$app/navigation';
 
-  //   //Will align the variable to MockAPI - should be changed later on
-  //   interface Family {
-  //   lastname?: string;
-  //   familynumber?: number;
-  //   father?: string;
-  //   selectedpurok?: string;
-  // }
 
-  // let families: Family[] = [];
-  // let searchTerm: string = '';
-  // let loading: boolean = true; 
-
-   
-  //  const fetchFamilies = async () => {
-  //   try {
-  //     const response = await fetch('https://6740cc3cd0b59228b7f162ff.mockapi.io/familynumber');
-  //     families = await response.json(); 
-  //   } catch (error) {
-  //     console.error('Error fetching families:', error);
-  //   } finally {
-  //     loading = false; 
-  //   }
-  // };
-
-  // fetchFamilies();
-
-  // For Offline purposes
-type Item = {
-    id: number;
-    firstname: string;
-    lastname: string;
-    familyrole: string;
-    };
-
-    let items: Item[] = [
-    { id: 1, lastname: 'De Guzman', firstname: 'Joe', familyrole: 'Father' },
-    { id: 2, lastname: 'De Guzman', firstname: 'Dina', familyrole: 'Mother' },
-    { id: 3, lastname: 'De Guzman', firstname: 'Jake', familyrole: 'Child' },
-    { id: 4, lastname: 'De Guzman', firstname: 'Mae', familyrole: 'Child' },
-
-   
-  
+    const routes = [
+  { path: '/FamilyMember/:id', component: Memberprofile }, // Dynamic route
 ];
+
+
+    interface Family {
+    familynumberid?: number;
+	  userid?: number; 
+    firstname?: string;
+    lastname?: string;
+  	familyrole?: string;
+
+  }
+
+  let families: Family[] = [];
+  let searchTerm: string = '';
+  let loading: boolean = true; 
+
+   
+ 
+  const fetchFamilies = async () => {
+  try {
+    const response = await fetch('http://localhost/api/memberprofile');
+    const result = await response.json();
+
+    if (Array.isArray(result.data)) {
+      families = result.data as Family[];
+      console.log('Fetched Families:', families);
+    } else {
+      console.error('Expected an array but received:', result.data);
+    }
+  } catch (error) {
+    console.error('Error fetching families:', error);
+  } finally {
+    loading = false;
+  }
+};
+
+fetchFamilies();
+  
   
 </script>
-
 
 <div class="relative">
     <!-- Container for the button -->
@@ -69,12 +69,10 @@ type Item = {
         <InputAddon>
           <SearchOutline class="w-4 h-4 text-gray-500 dark:text-gray-400" />
         </InputAddon>
-                <Input id="firstname" placeholder="Search Lastname or Family number" />
-
-        <!-- <Input id="firstname" bind:value={searchTerm} placeholder="Search Lastname or Family number" /> -->
+        <Input id="firstname" bind:value={searchTerm} placeholder="Search Lastname or Family number" />
       </ButtonGroup>
    
-    <!-- <Table
+    <Table
        
     >
         <TableHead class="bg-amber-300 text-center text-sm">
@@ -87,48 +85,28 @@ type Item = {
         <TableBody tableBodyClass="divide-y text-center">
             {#each families.filter((family: Family) => {
                 const lastname = family?.lastname?.toLowerCase() || ''; 
-                const familynumber = family?.familynumber?.toString() || ''; 
-                return lastname.includes(searchTerm.toLowerCase()) || familynumber.includes(searchTerm);
+                const familynumberid = family?.familynumberid?.toString() || ''; 
+                return lastname.includes(searchTerm.toLowerCase()) || familynumberid.includes(searchTerm);
               }) as family}   
             <TableBodyRow>
-                <TableBodyCell>{family.familynumber}</TableBodyCell>
+                <TableBodyCell>{family.userid}</TableBodyCell>
+                <TableBodyCell>{family.firstname}</TableBodyCell>
                 <TableBodyCell>{family.lastname}</TableBodyCell>
-                <TableBodyCell>{family.father}</TableBodyCell>
-                <TableBodyCell>{family.selectedpurok}</TableBodyCell>
+                <TableBodyCell>{family.familyrole}</TableBodyCell>
                 <TableBodyCell>
-                    <Button 
-                        style="background-color: #47663B" href="/MemberProfile" class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out">
-                        View <ArrowRightOutline class="w-3 h-3 ms-1 text-white" />
-                    </Button>
+                  <Button
+                  on:click={() => window.location.href = `/FamilyMember/${family.userid}`}
+                  style="background-color: #47663B"
+                  class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out"
+                >
+                  View <ArrowRightOutline class="w-3 h-3 ms-1 text-white" />
+                </Button>
+                
                 </TableBodyCell>
             </TableBodyRow>
             {/each}
         </TableBody>
-    </Table> -->
-
-    <Table
-       {items}
-    >
-        <TableHead class="bg-amber-300 text-center text-sm">
-            <TableHeadCell>ID</TableHeadCell>
-            <TableHeadCell>First Name</TableHeadCell>
-            <TableHeadCell>Last Name</TableHeadCell>
-            <TableHeadCell>Family Role</TableHeadCell>
-            <TableHeadCell>Actions</TableHeadCell> 
-        </TableHead>
-        <TableBody tableBodyClass="divide-y text-center"> 
-            <TableBodyRow slot="row" let:item>
-              <TableBodyCell class="bg-transparent">{(item as Item).id}</TableBodyCell>
-              <TableBodyCell class="bg-transparent">{(item as Item).lastname}</TableBodyCell>
-              <TableBodyCell class="bg-transparent">{(item as Item).firstname}</TableBodyCell>
-              <TableBodyCell class="bg-transparent">{(item as Item).familyrole}</TableBodyCell>
-                <TableBodyCell>
-                    <Button 
-                        style="background-color: #47663B" href="/MemberProfile" class="text-white text-xs py-1 px-3 rounded hover:bg-green-800 transition-all duration-200 ease-in-out">
-                        View <ArrowRightOutline class="w-3 h-3 ms-1 text-white" />
-                    </Button>
-                </TableBodyCell>
-           </TableBodyRow>
-        </TableBody>
     </Table>
+
+   
 </div>

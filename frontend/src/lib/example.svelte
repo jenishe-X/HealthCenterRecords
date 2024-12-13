@@ -41,9 +41,6 @@ const fetchFamilies = async () => {
 
 fetchFamilies();
 
-
-
-
     let formModal = false;
 
     export let family;
