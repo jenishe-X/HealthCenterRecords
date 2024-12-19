@@ -4,14 +4,42 @@
     import { onMount } from 'svelte';
     import { Label, Input, InputAddon, ButtonGroup, Select, Helper, Radio } from 'flowbite-svelte';
     import { UserCircleSolid, MapPinAltSolid } from 'flowbite-svelte-icons';
-    // import { Datepicker } from 'flowbite-svelte';
-    import { Modal } from 'flowbite-svelte';
+    import { Datepicker } from 'flowbite-svelte';
+    import { Modal, Button } from 'flowbite-svelte';
     import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
     import { Router, Route } from 'svelte-routing';
-  
+    import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
+
+    let popupModal = false;
+    let formattedBirthday = '';
+    let updateModal = false;
+    let newModal = false;
+
+
+ // Ensure member.birthday is a valid string and parse it
+$: {
+   if (member && member.birthday) {
+      // Convert to string if it's not already a string
+      const birthdayString = typeof member.birthday === 'string' ? member.birthday : String(member.birthday);
+
+      // Try to parse the date string
+      const parsedDate = Date.parse(birthdayString);
+
+      if (!isNaN(parsedDate)) {
+         // If valid, create a Date object and format it
+         const date = new Date(parsedDate);
+         formattedBirthday = date.toLocaleDateString('en-GB'); // Format as 'DD/MM/YYYY'
+      } else {
+         formattedBirthday = '';
+      }
+   } else {
+      formattedBirthday = '';
+   }
+}
 
     let formModal = false;
-  
+
+    
   
     interface Member {
         familynumberid: number;
@@ -50,7 +78,7 @@
     let isLoading = true;
     let visit: Visitation[] = [];
 
-
+   
   
   
     onMount(async () => {
@@ -59,6 +87,8 @@
         if (response.ok) {
             const data = await response.json(); // Parse the JSON
             console.log(data); // Inspect the full response to debug
+            initialFormData = { ...data };  // Set initial data from the API
+            formData = { ...data };  // Bind the form data to the fetched values
             
             // Access the payload array
             if (data.payload && data.payload.length > 0) {
@@ -77,6 +107,49 @@
     }
 });
 
+ // Function to update member data
+ async function updateMember() {
+    try {
+        // Define the member type
+        const updatedFields: Record<string, any> = {}; // Create a dynamic object for updated fields
+
+        // Loop through each key in the member object and add changed values
+        for (let key in member) {
+            if (member.hasOwnProperty(key)) {
+                const typedKey = key as keyof Member;  // Explicitly type the key
+                // Check if the value is not null or empty, then include it in updatedFields
+                if (member[typedKey] !== null && member[typedKey] !== "") {
+                    updatedFields[typedKey] = member[typedKey];
+                }
+            }
+        }
+
+        // If there are no changes, log and return
+        if (Object.keys(updatedFields).length === 0) {
+            console.log('No changes detected');
+            return;  // Exit if no updates are present
+        }
+
+        // Send the PATCH request with the updated fields
+        const response = await fetch(`http://localhost/api/memberprofile2/${userid}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedFields) // Send only updated fields
+        });
+
+        // Check for successful response
+        if (response.ok) {
+            const updatedData = await response.json();
+            console.log('Member updated successfully:', updatedData);
+        } else {
+            console.error('Failed to update member data');
+        }
+    } catch (error) {
+        console.error('Error updating data:', error);
+    }
+}
 
 
 onMount(async () => {
@@ -111,6 +184,109 @@ onMount(async () => {
             isLoading = false;
         }
     });
+
+    let postvisitation: Visitation[] = [];
+
+
+
+
+     // Initial object for new family data
+    //  let newVisit = { 
+    //   familynumberid: 0,
+    //     userid: undefined,
+    //     firstname: '',
+    //     lastname: '',
+    //     middlename: '',
+    //     birthday: null, // Default to null for Date
+    //     sex: '',
+    //     contactnumber: '',
+    //     purok: '',
+    //     address: '',
+    //     familyrole: '',
+    //     fathername: '',
+    //     mothername: '',
+    //     philhealth: '',
+    //     philmember: '',
+    //     philDM: '',
+    //     philbday: null, // Default to null for Date
+    //  };
+
+
+
+    let newVisit: {
+    userid: string | null; // Explicitly allow null
+    dateTime: string | null;
+    age: number;
+    wt: string;
+    ht: string;
+    bp: string;
+    temp: string;
+    complaints: string;
+    diagnosis: string;
+    physicianDirections: string;
+} = {
+    userid: null, // Initially null
+    dateTime: null,
+    age: 0,
+    wt: '',
+    ht: '',
+    bp: '',
+    temp: '',
+    complaints: '',
+    diagnosis: '',
+    physicianDirections: '',
+};
+$: newVisit.userid = $page.params.userid ? String($page.params.userid) : null;
+$: newVisit.wt = newVisit.wt && !newVisit.wt.endsWith('kg') ? newVisit.wt.replace(/kg$/, '').trim() + ' kg' : newVisit.wt;
+$: newVisit.ht = newVisit.ht && !newVisit.ht.endsWith('cm') ? newVisit.ht.replace(/cm$/, '').trim() + ' cm' : newVisit.ht;
+$: newVisit.temp = newVisit.temp && !newVisit.temp.endsWith('°C') ? newVisit.temp.replace(/°C$/, '').trim() + '°C' : newVisit.temp;
+
+
+
+
+
+    async function addVisitation() {
+
+    try {
+        const response = await fetch("http://localhost/api/membervisitation", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newVisit),
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log("Added visitation:", result);
+
+            // Ensure `postvisitation` is updated
+            postvisitation = [...postvisitation, result];
+
+            // Reset newVisit to default
+            newVisit = {
+              userid: newVisit.userid,
+                dateTime: null,
+                age: 0,
+                wt: '',
+                ht: '',
+                bp: '',
+                temp: '',
+                complaints: '',
+                diagnosis: '',
+                physicianDirections: '',
+            };
+
+            alert("Form submitted successfully!");
+        } else {
+            console.error("Failed to post visitation:", response.status);
+        }
+    } catch (error) {
+        console.error("Error posting data:", error);
+    }
+}
+
+
 
 
   
@@ -245,6 +421,121 @@ onMount(async () => {
   
         return valid;
     };
+
+    // const validateVisit = () => {
+    //     let valid = true;
+  
+    //     if (!visit?.dateTime) {
+    //         errors.firstname = 'Firstname is required';
+    //         valid = false;
+    //     } else {
+    //         errors.firstname = '';
+    //     }
+  
+    //     if (!visit?.age) {
+    //       errors.lastname = 'Lastname is required';
+    //       valid = false;
+    //   } else {
+    //       errors.lastname = '';
+    //   }
+  
+    //   if (!member?.middlename) {
+    //       errors.middlename = 'Middlename is required';
+    //       valid = false;
+    //   } else {
+    //       errors.middlename = '';
+    //   }
+  
+    //   if (!member?.birthday) {
+    //       errors.birthday = 'Birthday is required';
+    //       valid = false;
+    //   } else {
+    //       errors.birthday = '';
+    //   }
+  
+    //   if (!member?.sex) {
+    //       errors.sex = 'Sex is required';
+    //       valid = false;
+    //   } else {
+    //       errors.sex = '';
+    //   }
+  
+    //   if (!member?.contactnumber) {
+    //       errors.contactnumber = 'Contact number is required';
+    //       valid = false;
+    //   } else {
+    //       errors.contactnumber = '';
+    //   }
+  
+    //   if (!member?.purok) {
+    //       errors.purok = 'Purok is required';
+    //       valid = false;
+    //   } else {
+    //       errors.purok = '';
+    //   }
+  
+    //   if (!member?.address) {
+    //       errors.address = 'Address is required';
+    //       valid = false;
+    //   } else {
+    //       errors.address = '';
+    //   }
+  
+    //   if (!member?.familyrole) {
+    //       errors.familyrole = 'Family role is required';
+    //       valid = false;
+    //   } else {
+    //       errors.familyrole = '';
+    //   }
+  
+    //   if (!member?.fathername) {
+    //       errors.fathername = 'Father\'s name is required';
+    //       valid = false;
+    //   } else {
+    //       errors.fathername = '';
+    //   }
+  
+    //   if (!member?.mothername) {
+    //       errors.mothername = 'Mother\'s name is required';
+    //       valid = false;
+    //   } else {
+    //       errors.mothername = '';
+    //   }
+  
+    //   if (!member?.philhealth) {
+    //       errors.philhealth = 'PhilHealth is required';
+    //       valid = false;
+    //   } else {
+    //       errors.philhealth = '';
+    //   }
+  
+    //   if (!member?.philmember) {
+    //       errors.philmember = 'PhilHealth member status is required';
+    //       valid = false;
+    //   } else {
+    //       errors.philmember = '';
+    //   }
+  
+    //   if (!member?.philDM) {
+    //       errors.philDM = 'PhilHealth dependent member status is required';
+    //       valid = false;
+    //   } else {
+    //       errors.philDM = '';
+    //   }
+  
+    //   if (!member?.philbday) {
+    //       errors.philbday = 'PhilHealth birthday is required';
+    //       valid = false;
+    //   } else {
+    //       errors.philbday = '';
+    //   }
+  
+  
+    //     // Validate other fields similarly...
+  
+    //     return valid;
+    // };
+  
   
     const handleSubmit = () => {
         if (validateForm()) {
@@ -267,73 +558,51 @@ onMount(async () => {
 
       ];
   
-      let purok = [
-        { value: 'Purok 2', name: 'Purok 2' },
-        { value: '1-A', name: '1-A' },
-        { value: '1B', name: '1B' },
-        { value: '2', name: '2' },
-        { value: '3A', name: '3A' },
-        { value: '3B', name: '3B' },
-        { value: '3C', name: '3C' },
-        { value: '3D', name: '3D' },
-        { value: '3E', name: '3E' },
-        { value: '3F', name: '3F' },
-        { value: '4A', name: '4A' },
-        { value: '4B', name: '4B' },
-        { value: '4C', name: '4C' },
-        { value: '4D', name: '4D' },
-        { value: '4E', name: '4E' },
-        { value: '5A1', name: '5A1' },
-        { value: '5A', name: '5A' },
-        { value: '5B', name: '5B' },
-        { value: '5C', name: '5C' },
-        { value: '5D', name: '5D' },
-        { value: '5E', name: '5E' },
-        { value: '5F', name: '5F' },
-        { value: '6A', name: '6A' },
-        { value: '6A EXT', name: '6A EXT' },
-        { value: '6B1', name: '6B1' },
-        { value: '6B2', name: '6B2' },
-        { value: '6C1', name: '6C1' },
-        { value: '6C2', name: '6C2' },
-        { value: '6D', name: '6D' },
-        { value: '6E', name: '6E' },
-        { value: '7', name: '7' },
-      ];
-  
-  
-      type Item = {
-      id: number;
-      dateTime: string;
-      age: number;
-      wt: string; // Weight
-      ht: string; // Height
-      bp: string; // Blood Pressure
-      temp: string; // Temperature
-      complaints: string;
-      diagnosis: string;
-      physicianDirections: string;
-      };
-  
-      
-      // Define the data
-      let items: Item[] = [
-      { id: 1, dateTime: '2024-11-19 10:00', age: 45, wt: '70kg', ht: '175cm', bp: '120/80', temp: '36.7°C', complaints: 'Headache', diagnosis: 'Migraine', physicianDirections: 'Take prescribed medication' },
-      { id: 2, dateTime: '2024-11-18 14:00', age: 40, wt: '65kg', ht: '160cm', bp: '110/70', temp: '36.5°C', complaints: 'Fatigue', diagnosis: 'Anemia', physicianDirections: 'Increase iron intake' },
-      { id: 3, dateTime: '2024-11-17 16:30', age: 20, wt: '55kg', ht: '168cm', bp: '115/75', temp: '37.0°C', complaints: 'Cough', diagnosis: 'Common Cold', physicianDirections: 'Stay hydrated and rest' },
-      { id: 4, dateTime: '2024-11-16 09:15', age: 50, wt: '80kg', ht: '180cm', bp: '130/85', temp: '37.2°C', complaints: 'Back Pain', diagnosis: 'Muscle Strain', physicianDirections: 'Apply heat and rest' }
-  ];
+
   
   let datetime = '';
     let age = '';
-    let weight = '';
-    let height = '';
+    let wt = '';
+    let ht = '';
     let bp = '';
     let temp = '';  
     let complaints = '';
     let diagnosis = '';
     let physiciansDirections = '';
+
+
+    // let updatedMember = { ...(member || {}) };
+    // let changedValues: { [key: string]: any } = {}; // Object to store changed values
+
+    let initialFormData: Member = {
+    familynumberid: 0,
+    userid: undefined,
+    firstname: '',
+    lastname: '',
+    middlename: '',
+    birthday: null,
+    sex: '',
+    contactnumber: '',
+    purok: '',
+    address: '',
+    familyrole: '',
+    fathername: '',
+    mothername: '',
+    philhealth: '',
+    philmember: '',
+    philDM: '',
+    philbday: null
+  };
+
+  let formData: Member = { ...initialFormData };
+
+    // Function to check if a field has been modified
+    function hasChanged(field: keyof Member): boolean {
+    return formData[field] !== initialFormData[field];
+  }
+    
   </script>
+
   
   <NavBar/>
   <main>
@@ -350,7 +619,9 @@ onMount(async () => {
               <InputAddon>
                 <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
               </InputAddon>
-              <Input id="firstname" bind:value={member.firstname} placeholder="Dela Cruz" />
+              <Input id="firstname" disabled bind:value={member.firstname} placeholder="Dela Cruz" 
+
+              />
             </ButtonGroup>
             {#if errors.firstname}
               <Helper class="mt-2" color="red">{errors.firstname}</Helper>
@@ -361,7 +632,7 @@ onMount(async () => {
           <div class="mb-1">
             <Label for="lastname" class="block mb-2">Last Name</Label>
             <ButtonGroup class="w-full">
-              <Input id="lastname" bind:value={member.lastname} placeholder="Juan" />
+              <Input id="lastname" disabled bind:value={member.lastname} placeholder="Juan" />
             </ButtonGroup>
             {#if errors.lastname}
               <Helper class="mt-2" color="red">{errors.lastname}</Helper>
@@ -372,7 +643,7 @@ onMount(async () => {
           <div class="mb-1">
             <Label for="middlename" class="block mb-2">Middle Name</Label>
             <ButtonGroup class="w-full">
-              <Input id="middlename" bind:value={member.middlename} placeholder="Montez" />
+              <Input id="middlename" disabled bind:value={member.middlename} placeholder="Montez" />
             </ButtonGroup>
             {#if errors.middlename}
               <Helper class="mt-2" color="red">{errors.middlename}</Helper>
@@ -395,7 +666,7 @@ onMount(async () => {
               <InputAddon>
                   <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 </InputAddon>
-              <Input id="fathername" bind:value={member.fathername} placeholder="Full Name" />
+              <Input id="fathername" disabled bind:value={member.fathername} placeholder="Full Name" />
             </ButtonGroup>
             {#if errors.fathername}
               <Helper class="mt-2" color="red">{errors.fathername}</Helper>
@@ -409,7 +680,7 @@ onMount(async () => {
                 <InputAddon>
                     <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                   </InputAddon>
-                <Input id="mothername" bind:value={member.mothername} placeholder="Full Name" />
+                <Input id="mothername" disabled bind:value={member.mothername} placeholder="Full Name" />
               </ButtonGroup>
               {#if errors.mothername}
                 <Helper class="mt-2" color="red">{errors.mothername}</Helper>
@@ -421,7 +692,7 @@ onMount(async () => {
               <Label for="contact-number" class="block mb-2">Contact Number</Label>
               <ButtonGroup class="w-full">
                 <InputAddon>(+63)</InputAddon>
-                <Input id="contact-number" bind:value={member.contactnumber} placeholder="Enter your number" />
+                <Input id="contact-number" disabled bind:value={member.contactnumber} placeholder="Enter your number" />
               </ButtonGroup>
               {#if errors.contactnumber}
                 <Helper class="mt-2" color="red">{errors.contactnumber}</Helper>
@@ -432,30 +703,13 @@ onMount(async () => {
           <div class="mt-4 flex items-center space-x-4">
               <Label for="sex" class="block">Sex: </Label>
               <div class="flex space-x-6">
-                <Radio name="Male" value="Male" bind:group={member.sex}>Male</Radio>
-                <Radio name="Female" value="Female" bind:group={member.sex}>Female</Radio>
+                <Radio name="Male"  disabled value="Male" bind:group={member.sex}>Male</Radio>
+                <Radio name="Female" disabled value="Female" bind:group={member.sex}>Female</Radio>
               </div>
               {#if errors.sex}
                 <Helper class="mt-2" color="red">{errors.sex}</Helper>
               {/if}
             </div>  
-          
-          <!-- Purok -->
-          <div class="mb-1">
-          <Label>
-              Purok
-              <Select class="mt-2" bind:value={member.purok}>
-                {#each purok as purok}
-                  <option value={purok.value}>{purok.name}</option>
-                {/each}
-              </Select>
-            </Label>
-            {#if errors.purok}
-              <Helper class="mt-2" color="red">{errors.purok}</Helper>
-            {/if}
-          </div>
-  
-       
   
            <!-- Address -->
            <div class="mb-1">
@@ -464,7 +718,7 @@ onMount(async () => {
                   <InputAddon>
                       <MapPinAltSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                   </InputAddon>
-                <Input id="address" bind:value={member.address} placeholder="Address" />
+                <Input id="address" disabled bind:value={member.address} placeholder="Address" />
               </ButtonGroup>
               {#if errors.address}
                 <Helper class="mt-2" color="red">{errors.address}</Helper>
@@ -474,7 +728,7 @@ onMount(async () => {
           <!--Family Role-->
           <Label>
               Family Role
-              <Select class="mt-2" bind:value={member.familyrole}>
+              <Select class="mt-2" disabled bind:value={member.familyrole}>
                 {#each familyrole as role}
                   <option value={role.value}>{role.name}</option>
                 {/each}
@@ -487,7 +741,7 @@ onMount(async () => {
           <!--Philhealth-->
           <Label>
               Philhealth
-              <Select class="mt-2" bind:value={member.philhealth}>
+              <Select class="mt-2" disabled bind:value={member.philhealth}>
                 {#each philhealth as phil}
                   <option value={phil.value}>{phil.name}</option>
                 {/each}
@@ -501,7 +755,7 @@ onMount(async () => {
           {#if member.philhealth === 'WithPhilhealth'}
               <div class="-mt-1">
                 <Label for="philmember" class="block mb-2">Philhealth Member:</Label>
-                <Input id="other-assistance" bind:value={member.philmember} placeholder="Philhealth Member" />
+                <Input id="other-assistance" disabled bind:value={member.philmember} placeholder="Philhealth Member" />
                 {#if errors.philmember}
                 <Helper class="mt-2" color="red">{errors.philmember}</Helper>
               {/if}
@@ -517,8 +771,8 @@ onMount(async () => {
                   <div class="mt-4 flex items-center space-x-4">
                       <Label for="philDM" class="block">Status: </Label>
                       <div class="flex space-x-6">
-                        <Radio name="Member" value="Member" bind:group={member.philDM}>Member</Radio>
-                        <Radio name="Dependent" value="Dependent" bind:group={member.philDM}>Dependent</Radio>
+                        <Radio name="Member" disabled value="Member" bind:group={member.philDM}>Member</Radio>
+                        <Radio name="Dependent" disabled value="Dependent" bind:group={member.philDM}>Dependent</Radio>
                         {#if errors.philDM}
                 <Helper class="mt-2" color="red">{errors.philDM}</Helper>
               {/if}
@@ -534,7 +788,9 @@ onMount(async () => {
     <button on:click={() => (formModal = true)} class="text-white rounded-full px-6 py-3 bg-green-950">
         Add Visit &rarr;
     </button>
-    <button class="text-white rounded-full px-6 py-3 bg-green-950">
+    <button 
+    on:click={() => (updateModal = true)}
+    class="text-white rounded-full px-6 py-3 bg-green-950">
       Update Profile &rarr;
     </button>
     <button class="text-white rounded-full px-6 py-3 bg-green-950">
@@ -581,111 +837,307 @@ onMount(async () => {
   </main>
   
   <Modal bind:open={formModal} size="xs" autoclose={false} class="w-full">
-  <form class="flex flex-col space-y-6" action="#">
-  <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Adding Visitation</h3>
-  <!-- Date/Time -->
-  <div class="mb-1">
-  <Label for="datetime" class="block mb-2">Date/Time</Label>
-  <ButtonGroup class="w-full">
-  <InputAddon>
-  </InputAddon>
-  <Input id="datetime" bind:value={datetime} placeholder="MM/DD/YYYY HH:MM" />
-  </ButtonGroup>
-  </div>
+    <form class="flex flex-col space-y-6" action="#">
+        <h3 class="text-xl font-medium text-gray-900 dark:text-white">Adding Visitation</h3>
+        <!-- Date/Time -->
+
+        <div class="mb-1">
+          <Label for="userid" class="block mb-2">User ID</Label>
+          <Input id="userid" disabled bind:value={newVisit.userid} placeholder={newVisit.userid} />
+      </div>
+
+        <div class="mb-1">
+            <Label for="datetime" class="block mb-2">Date/Time</Label>
+            <Input id="datetime" bind:value={newVisit.dateTime} placeholder="MM/DD/YYYY HH:MM" />
+        </div>
+        <!-- Age -->
+        <div class="mb-1">
+            <Label for="age" class="block mb-2">Age</Label>
+            <Input id="age" bind:value={newVisit.age} placeholder="Enter Age" />
+        </div>
+        <!-- WT -->
+        <div class="mb-1">
+            <Label for="weight" class="block mb-2">WT</Label>
+            <Input id="weight" bind:value={newVisit.wt} placeholder="Enter Weight (kg)" />
+        </div>
+        <!-- HT -->
+        <div class="mb-1">
+            <Label for="height" class="block mb-2">HT</Label>
+            <Input id="height" bind:value={newVisit.ht} placeholder="Enter Height (cm)" />
+        </div>
+        <!-- BP -->
+        <div class="mb-1">
+            <Label for="bp" class="block mb-2">BP</Label>
+            <Input id="bp" bind:value={newVisit.bp} placeholder="Enter Blood Pressure" />
+        </div>
+        <!-- Temp -->
+        <div class="mb-1">
+            <Label for="temp" class="block mb-2">Temp</Label>
+            <Input id="temp" bind:value={newVisit.temp} placeholder="Enter Temperature (°C)" />
+        </div>
+        <!-- Complaints -->
+        <div class="mb-1">
+            <Label for="complaints" class="block mb-2">Complaints</Label>
+            <Input id="complaints" bind:value={newVisit.complaints} placeholder="Enter Complaints" />
+        </div>
+        <!-- Diagnosis -->
+        <div class="mb-1">
+            <Label for="diagnosis" class="block mb-2">Diagnosis</Label>
+            <Input id="diagnosis" bind:value={newVisit.diagnosis} placeholder="Enter Diagnosis" />
+        </div>
+        <!-- Physician's Directions -->
+        <div class="mb-1">
+            <Label for="physiciansDirections" class="block mb-2">Physician's Directions</Label>
+            <Input id="physiciansDirections" bind:value={newVisit.physicianDirections} placeholder="Enter Directions" />
+        </div>
+        <!-- Buttons -->
+        <div class="mt-5 flex justify-left space-x-4">
+            <button type="submit" class="text-white rounded-full px-6 py-3 bg-green-950  hover:bg-green-700"
+            on:click={() => (newModal = true)}
+            >
+                Add Visit &rarr;
+            </button>
+        </div>
+    </form>
+</Modal>
+
+
+  <Modal bind:open={updateModal} size="xl" autoclose={false} class="bg-white mx-auto  left-0 right-0 top-10 p-5 rounded-lg shadow-md max-w-2xl h-100">
+    <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Updating Profile</h3>
+    <div class="grid grid-cols-2 gap-6">
+
+      {#if isLoading}
+      <p>Loading member data...</p>
+      {:else if member}
+
+      <!-- First Name -->
+      <div class="mb-1">
+        <Label for="firstname" class="block mb-2">First Name</Label>
+        <ButtonGroup class="w-full">
+          <InputAddon>
+            <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          </InputAddon>
+          <Input id="firstname" bind:value={member.firstname} placeholder="Dela Cruz" 
+          class={hasChanged('firstname') ? 'bg-yellow-100' : 'bg-white'} 
+          />
+        </ButtonGroup>
+        {#if errors.firstname}
+          <Helper class="mt-2" color="red">{errors.firstname}</Helper>
+        {/if}
+      </div>
+
+      <!-- Last Name -->
+      <div class="mb-1">
+        <Label for="lastname" class="block mb-2">Last Name</Label>
+        <ButtonGroup class="w-full">
+          <Input id="lastname" bind:value={member.lastname} placeholder="Juan" />
+        </ButtonGroup>
+        {#if errors.lastname}
+          <Helper class="mt-2" color="red">{errors.lastname}</Helper>
+        {/if}
+      </div>
+
+      <!-- Middle Name -->
+      <div class="mb-1">
+        <Label for="middlename" class="block mb-2">Middle Name</Label>
+        <ButtonGroup class="w-full">
+          <Input id="middlename" bind:value={member.middlename} placeholder="Montez" />
+        </ButtonGroup>
+        {#if errors.middlename}
+          <Helper class="mt-2" color="red">{errors.middlename}</Helper>
+        {/if}
+      </div>
+
+      <!-- Birthday -->
+      <div class="mb-1">
+        <Label for="landmark" class="block mb-2">Birthday</Label>
+          <!-- <Datepicker bind:value={member.birthday}/> -->
+          {#if errors.birthday}
+            <Helper class="mt-2" color="red">{errors.birthday}</Helper>
+          {/if}
+      </div>
+
+      <!--Father's Name-->
+      <div class="mb-1">
+        <Label for="fathername" class="block mb-2">Father's Name</Label>
+        <ButtonGroup class="w-full">
+          <InputAddon>
+              <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            </InputAddon>
+          <Input id="fathername" bind:value={member.fathername} placeholder="Full Name" />
+        </ButtonGroup>
+        {#if errors.fathername}
+          <Helper class="mt-2" color="red">{errors.fathername}</Helper>
+        {/if}
+      </div>
+
+       <!--Mother's Name-->
+       <div class="mb-1">
+          <Label for="mothername" class="block mb-2">Mother's Name</Label>
+          <ButtonGroup class="w-full">
+            <InputAddon>
+                <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              </InputAddon>
+            <Input id="mothername" bind:value={member.mothername} placeholder="Full Name" />
+          </ButtonGroup>
+          {#if errors.mothername}
+            <Helper class="mt-2" color="red">{errors.mothername}</Helper>
+          {/if}
+        </div>
+
+      <!--Contact Number -->
+      <div class="mb-1">
+          <Label for="contact-number" class="block mb-2">Contact Number</Label>
+          <ButtonGroup class="w-full">
+            <InputAddon>(+63)</InputAddon>
+            <Input id="contact-number" bind:value={member.contactnumber} placeholder="Enter your number" />
+          </ButtonGroup>
+          {#if errors.contactnumber}
+            <Helper class="mt-2" color="red">{errors.contactnumber}</Helper>
+          {/if}
+        </div>
+
+      <!--Sex-->
+      <div class="mt-4 flex items-center space-x-4">
+          <Label for="sex" class="block">Sex: </Label>
+          <div class="flex space-x-6">
+            <Radio name="Male" value="Male" bind:group={member.sex}>Male</Radio>
+            <Radio name="Female" value="Female" bind:group={member.sex}>Female</Radio>
+          </div>
+          {#if errors.sex}
+            <Helper class="mt-2" color="red">{errors.sex}</Helper>
+          {/if}
+        </div>  
+
+       <!-- Address -->
+       <div class="mb-1">
+          <Label for="address" class="block mb-2">Address</Label>
+          <ButtonGroup class="w-full">
+              <InputAddon>
+                  <MapPinAltSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              </InputAddon>
+            <Input id="address" bind:value={member.address} placeholder="Address" />
+          </ButtonGroup>
+          {#if errors.address}
+            <Helper class="mt-2" color="red">{errors.address}</Helper>
+          {/if}
+        </div>
+      
+      <!--Family Role-->
+      <Label>
+          Family Role
+          <Select class="mt-2" bind:value={member.familyrole}>
+            {#each familyrole as role}
+              <option value={role.value}>{role.name}</option>
+            {/each}
+          </Select>
+        </Label>
+        {#if errors.familyrole}
+          <Helper class="mt-2" color="red">{errors.familyrole}</Helper>
+        {/if}
+    
+      <!--Philhealth-->
+      <Label>
+          Philhealth
+          <Select class="mt-2" bind:value={member.philhealth}>
+            {#each philhealth as phil}
+              <option value={phil.value}>{phil.name}</option>
+            {/each}
+          </Select>
+        </Label>
+        {#if errors.philhealth}
+          <Helper class="mt-2" color="red">{errors.philhealth}</Helper>
+        {/if}
+
+      <!--With Philhealth-->
+      {#if member.philhealth === 'WithPhilhealth'}
+          <div class="-mt-1">
+            <Label for="philmember" class="block mb-2">Philhealth Member:</Label>
+            <Input id="other-assistance" bind:value={member.philmember} placeholder="Philhealth Member" />
+            {#if errors.philmember}
+            <Helper class="mt-2" color="red">{errors.philmember}</Helper>
+          {/if}
+          </div>
+          <div class="-mt-1">
+              <Label for="philbday" class="block mb-2">Member's Birthday</Label>
+              <!-- <Datepicker bind:value={member.philbday}/> -->
+              {#if errors.philbday}
+            <Helper class="mt-2" color="red">{errors.philbday}</Helper>
+          {/if}
+          </div>
+          <div class="-mt-1">
+              <div class="mt-4 flex items-center space-x-4">
+                  <Label for="philDM" class="block">Status: </Label>
+                  <div class="flex space-x-6">
+                    <Radio name="Member" value="Member" bind:group={member.philDM}>Member</Radio>
+                    <Radio name="Dependent" value="Dependent" bind:group={member.philDM}>Dependent</Radio>
+                    {#if errors.philDM}
+            <Helper class="mt-2" color="red">{errors.philDM}</Helper>
+          {/if}
+                  </div>
+                </div>   
+          </div>
+        {/if}
+{/if}
+       
+       
+
+    <!--Buttons-->
+    <div class="mt-4 flex justify-center space-x-4">
+        <Button class="text-white rounded-full px-6 py-3 bg-green-950"
+        on:click={() => updateModal = false}
+        >
+            Cancel &rarr;
+        </Button>
+        <Button on:click={() => (popupModal = true)} class="text-white rounded-full px-6 py-3 bg-green-950">
+          Submit &rarr;
+        </Button>
+      </div>
+    </div>    
+    </Modal>
+
+    <Modal bind:open={popupModal} size="xs" autoclose>
+      <div class="text-center">
+        <ExclamationCircleOutline class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" />
+        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to delete this product?</h3>
+        <Button color="red" class="me-2"
+        on:click={() => { 
+         alert('Member updated successfully!');
+         updateMember(); 
+        updateModal = false; 
+        window.location.reload();  // Reload the page
+
+
+        }}
+        >Yes, I'm sure</Button>
+        <Button color="alternative"
+        on:click={() => popupModal = false}
+        >No, cancel</Button>
+      </div>
+    </Modal>
+
+    <Modal bind:open={newModal} size="xs" autoclose>
+      <div class="text-center">
+        <ExclamationCircleOutline class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" />
+        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to add this record?</h3>
+        <Button color="red" class="me-2"
+        on:click={() => { 
+         alert('Member updated successfully!');
+         addVisitation(); 
+        formModal = false; 
+        window.location.reload();  // Reload the page
+
+        }}
+        >Yes, I'm sure</Button>
+        <Button color="alternative"
+        on:click={() => formModal = false}
+        >No, cancel</Button>
+      </div>
+    </Modal>
+
   
-  <!-- Age -->
-  <div class="mb-1">
-  <Label for="age" class="block mb-2">Age</Label>
-  <ButtonGroup class="w-full">
-  <InputAddon>
-  </InputAddon>
-  <Input id="age" bind:value={age} placeholder="Enter Age" />
-  </ButtonGroup>
-  </div>
-  
-  <!-- WT -->
-  <div class="mb-1">
-  <Label for="weight" class="block mb-2">WT</Label>
-  <ButtonGroup class="w-full">
-  <InputAddon>
-  </InputAddon>
-  <Input id="weight" bind:value={weight} placeholder="Enter Weight (kg)" />
-  </ButtonGroup>
-  </div>
-  
-  <!-- HT -->
-  <div class="mb-1">
-  <Label for="height" class="block mb-2">HT</Label>
-  <ButtonGroup class="w-full">
-  <InputAddon>
-  </InputAddon>
-  <Input id="height" bind:value={height} placeholder="Enter Height (cm)" />
-  </ButtonGroup>
-  </div>
-  
-  <!-- BP -->
-  <div class="mb-1">
-  <Label for="bp" class="block mb-2">BP</Label>
-  <ButtonGroup class="w-full">
-  <InputAddon>
-  </InputAddon>
-  <Input id="bp" bind:value={bp} placeholder="Enter Blood Pressure" />
-  </ButtonGroup>
-  </div>
-  
-  <!-- Temp -->
-  <div class="mb-1">
-  <Label for="temp" class="block mb-2">Temp</Label>
-  <ButtonGroup class="w-full">
-  <InputAddon>
-  </InputAddon>
-  <Input id="temp" bind:value={temp} placeholder="Enter Temperature (°C)" />
-  </ButtonGroup>
-  </div>
-  
-  <!-- Complaints -->
-  <div class="mb-1">
-  <Label for="complaints" class="block mb-2">Complaints</Label>
-  <ButtonGroup class="w-full">
-  <InputAddon>
-  </InputAddon>
-  <Input id="complaints" bind:value={complaints} placeholder="Enter Complaints" />
-  </ButtonGroup>
-  </div>
-  
-  <!-- Diagnosis -->
-  <div class="mb-1">
-  <Label for="diagnosis" class="block mb-2">Diagnosis</Label>
-  <ButtonGroup class="w-full">
-  <InputAddon>
-  </InputAddon>
-  <Input id="diagnosis" bind:value={diagnosis} placeholder="Enter Diagnosis" />
-  </ButtonGroup>
-  </div>
-  
-  <!-- Physician's Directions -->
-  <div class="mb-1">
-  <Label for="physiciansDirections" class="block mb-2">Physician's Directions</Label>
-  <ButtonGroup class="w-full">
-  <InputAddon>
-  </InputAddon>
-  <Input
-  id="physiciansDirections"
-  bind:value={physiciansDirections}
-  placeholder="Enter Directions"
-  />
-  </ButtonGroup>
-  </div>
-  
-  <!--Buttons-->
-  <div class="mt-5 flex justify-left space-x-4">
-      <button class="text-white rounded-full px-6 py-3 bg-green-950">
-          Add Visit &rarr;
-      </button>    
-  </div>
-  
-  </form>
-  </Modal>
+
+ 
   
   
   

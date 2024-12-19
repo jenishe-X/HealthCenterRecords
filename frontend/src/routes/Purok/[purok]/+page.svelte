@@ -62,7 +62,7 @@
      // Data passed from the load function
 
     // Initial object for new family data
-    let newFamily = { lastname: '', father: '', selectedpurok: '' };
+    let newFamily = { familylastname: '', father: '', purok: '' };
 
      async function addFamily() {
         if (!validateForm()) {
@@ -70,7 +70,7 @@
         }
 
         try {
-            const response = await fetch("https://6740cc3cd0b59228b7f162ff.mockapi.io/familynumber", {
+            const response = await fetch("http://localhost/api/familynumber", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -86,7 +86,7 @@
                 family = [...families, result];
 
               
-                newFamily = { lastname: '', father: '', selectedpurok: '' };
+                newFamily = { familylastname: '', father: '', purok: '' };
 
                 alert("Form submitted successfully!");
             } else {
@@ -150,7 +150,7 @@
           selectedpurok: '',
         }; // Reset errors before validation
 
-        if (!newFamily.lastname.trim()) {
+        if (!newFamily.familylastname.trim()) {
             errors.lastname = "Last Name is required.";
             valid = false;
         } else {
@@ -164,7 +164,7 @@
             errors.father = "";
         }
 
-        if (!newFamily.selectedpurok.trim()) {
+        if (!newFamily.purok.trim()) {
             errors.selectedpurok = "Selected Purok is required.";
             valid = false;
         } else {
@@ -253,7 +253,7 @@
       <ButtonGroup class="w-full">
         <InputAddon>
         </InputAddon>
-        <Input id="lastname" bind:value={newFamily.lastname} placeholder="Enter Lastname" />
+        <Input id="lastname" bind:value={newFamily.familylastname} placeholder="Enter Lastname" />
       </ButtonGroup>
       {#if errors.lastname}
       <Helper class="mt-2" color="red">{errors.lastname}</Helper>
@@ -278,7 +278,7 @@
       <ButtonGroup class="w-full block mb-2"> 
         <Label>
             Purok
-            <Select class="mt-2" bind:value={newFamily.selectedpurok}>
+            <Select class="mt-2" bind:value={newFamily.purok}>
               {#each selectpurok as purok}
                 <option value={purok.value}>{purok.name}</option>
               {/each}
